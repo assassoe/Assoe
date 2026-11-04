@@ -37,6 +37,42 @@ test('il repository si costruisce anche con il client Sanity predefinito', () =>
   assert.equal(typeof repository.listArticles, 'function');
 });
 
+test('le sezioni della homepage seguono l’ordine pubblicato e completano i dati mancanti', async () => {
+  const { repository } = setup({
+    [queries.homeSectionOrderQuery]: [{ section: 'articles' }, { section: 'notices' }, { section: 'articles' }, null],
+  });
+  assert.deepEqual(await repository.listHomeSections(), ['articles', 'notices', 'event', 'social', 'volunteering', 'support']);
+  const missing = setup({ [queries.homeSectionOrderQuery]: null });
+  assert.deepEqual(await missing.repository.listHomeSections(), ['notices', 'event', 'social', 'volunteering', 'articles', 'support']);
+});
+
+test('la build condivide l’ordine delle sezioni mentre lo sviluppo legge ogni aggiornamento', async () => {
+  let current = [{ section: 'support' }];
+  const responses = { [queries.homeSectionOrderQuery]: () => current };
+  const { repository, fetch } = setup(responses);
+  const first = repository.listHomeSections();
+  assert.equal(repository.listHomeSections(), first);
+  assert.equal((await first)[0], 'support');
+  assert.equal(fetch.mock.callCount(), 1);
+  const dev = setup(responses, { development: true });
+  assert.equal((await dev.repository.listHomeSections())[0], 'support');
+  current = [{ section: 'articles' }];
+  assert.equal((await dev.repository.listHomeSections())[0], 'articles');
+  assert.equal(dev.fetch.mock.callCount(), 2);
+});
+
+test('un errore nella lettura dell’ordine non viene nascosto e consente un nuovo tentativo', async () => {
+  let fail = true;
+  const error = new Error('Sanity non disponibile');
+  const { repository } = setup({ [queries.homeSectionOrderQuery]: () => {
+    if (fail) throw error;
+    return [{ section: 'event' }];
+  } });
+  await assert.rejects(repository.listHomeSections(), (received) => received === error);
+  fail = false;
+  assert.equal((await repository.listHomeSections())[0], 'event');
+});
+
 test('gli elenchi scartano record corrotti e restituiscono slug pubblici e foto sicure', async () => {
   const { repository } = setup({
     [queries.initiativesQuery]: [initiative, null, { ...initiative, slug: 'Non valido' }],

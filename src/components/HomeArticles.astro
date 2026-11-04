@@ -1,0 +1,27 @@
+---
+import ArticleList from './ArticleList.astro';
+import type { ArticleSummary } from '@/content/types';
+import { ARTICLES_TITLE } from '@/config/site';
+import { sitePath } from '@/utils/sitePath';
+
+interface Props { articles: ArticleSummary[]; }
+const { articles } = Astro.props;
+---
+
+<section class="section container" aria-labelledby="articoli-home">
+  <div class="section__header">
+    <div>
+      <p class="eyebrow">Dal territorio</p>
+      <h2 id="articoli-home">{ARTICLES_TITLE}</h2>
+      <p class="section__intro">Racconti e aggiornamenti da leggere con calma.</p>
+    </div>
+    <a class="text-link" href={sitePath('/articoli/')}>Sfoglia gli articoli <span aria-hidden="true">↗</span></a>
+  </div>
+  {
+    articles.length > 0 ? (
+      <ArticleList articles={articles.slice(0, 3)} />
+    ) : (
+      <p class="notice">Per ora non ci sono articoli da leggere.</p>
+    )
+  }
+</section>

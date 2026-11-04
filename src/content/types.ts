@@ -1,5 +1,6 @@
 /** Dati che il sito usa, indipendenti dalla forma scelta dal CMS. */
 export type InitiativeArea = import('../../shared/initiativeAreas').InitiativeArea;
+export type HomeSectionId = import('../../shared/homeSections').HomeSectionId;
 
 export interface InitiativeSummary {
   id: string;
@@ -108,6 +109,7 @@ export interface HomeNotice {
 
 /** Le pagine dipendono da questo contratto, non da un client CMS. */
 export interface ContentRepository {
+  listHomeSections(): Promise<HomeSectionId[]>;
   listHomeNotices(): Promise<HomeNotice[]>;
   listInitiatives(): Promise<InitiativeSummary[]>;
   getInitiativeBySlug(slug: string): Promise<InitiativeDetail | null>;

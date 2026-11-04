@@ -4,6 +4,7 @@ import { articlePublicSlug } from '../../utils/articleSlug.ts';
 import { cachePromise } from '../../utils/cachePromise.ts';
 import { assertUniqueSlugs } from '../../utils/content.ts';
 import { sanityAssetUrlOrUndefined } from '../../../shared/url.ts';
+import { resolveHomeSectionOrder } from '../../../shared/homeSections.ts';
 import {
   articleByIdQuery,
   articlesByInitiativeQuery,
@@ -13,6 +14,7 @@ import {
   eventsByInitiativeQuery,
   eventsQuery,
   homeNoticesQuery,
+  homeSectionOrderQuery,
   initiativeBySlugQuery,
   initiativesQuery,
   peopleQuery,
@@ -105,6 +107,7 @@ export function createSanityRepository(
   });
 
   const listHomeNotices = cache(async () => toHomeNotices(await client.fetch<unknown>(homeNoticesQuery)));
+  const listHomeSections = cache(async () => resolveHomeSectionOrder(await client.fetch<unknown>(homeSectionOrderQuery)));
 
   const getAssociationInfo = cache(async (): Promise<AssociationInfo | null> => {
     const info = await client.fetch<unknown>(associationQuery);
@@ -115,6 +118,7 @@ export function createSanityRepository(
   });
 
   return {
+    listHomeSections,
     listHomeNotices,
     listInitiatives,
 

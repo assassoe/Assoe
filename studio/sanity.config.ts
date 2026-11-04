@@ -19,7 +19,7 @@ export default defineConfig({
           .title('Contenuti')
           .items([
             S.listItem().singleton('siteSettings'),
-            S.listItem().singleton('homeSettings').title('Avvisi'),
+            S.listItem().singleton('homeSettings').title('Homepage'),
             S.divider(),
             ...S.documentTypeListItems()
               .filter((item) => !['siteSettings', 'homeSettings'].includes(item.getId() ?? ''))

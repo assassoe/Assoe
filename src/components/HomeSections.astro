@@ -1,0 +1,31 @@
+---
+import HomeArticles from './HomeArticles.astro';
+import HomeNextEvent from './HomeNextEvent.astro';
+import HomeSupport from './HomeSupport.astro';
+import HomeNotices from './HomeNotices.astro';
+import InitiativeAreaSection from './InitiativeAreaSection.astro';
+import type { ArticleSummary, EventSummary, HomeNotice, HomeSectionId, InitiativeSummary } from '@/content/types';
+import { groupInitiatives } from '@/utils/initiatives';
+
+interface Props {
+  homeSections: HomeSectionId[];
+  notices: HomeNotice[];
+  initiatives: InitiativeSummary[];
+  articles: ArticleSummary[];
+  featuredEvent?: EventSummary;
+}
+const { homeSections, notices, initiatives, articles, featuredEvent } = Astro.props;
+const initiativeGroups = groupInitiatives(initiatives);
+---
+
+{homeSections.map((section) => (
+  <>
+    {section === 'notices' && <HomeNotices notices={notices} />}
+    {section === 'event' && featuredEvent && <HomeNextEvent event={featuredEvent} />}
+    {initiativeGroups.filter((group) => group.value === section).map((group) => (
+      <InitiativeAreaSection group={group} home />
+    ))}
+    {section === 'articles' && <HomeArticles articles={articles} />}
+    {section === 'support' && <HomeSupport />}
+  </>
+))}

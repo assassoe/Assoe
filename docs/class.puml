@@ -40,7 +40,8 @@ class DatiBancari {
     -banca: String (opzionale)
 }
 
-class Avvisi <<singleton>> {
+class Homepage <<singleton>> {
+    -ordineSezioni: List<SezioneHomepage> (opzionale, sei elementi unici)
     -avvisi: List<Avviso> (massimo 3, ordinabile)
 }
 
@@ -105,6 +106,15 @@ class Persona {
 ' Enumerazioni
 ' ==============================================================
 
+enum SezioneHomepage {
+    Avvisi
+    ProssimoAppuntamento
+    IniziativeSociali
+    Volontariato
+    Articoli
+    CinquePerMille
+}
+
 enum AmbitoIniziativa {
     Sociali
     Volontariato
@@ -133,7 +143,7 @@ enum StatoEvento {
 InformazioniAssociazione "1" *-- "1" Contatti
 InformazioniAssociazione "1" *-- "0..*" ProfiloSocial
 InformazioniAssociazione "1" *-- "0..1" DatiBancari
-Avvisi "1" *-- "0..3" Avviso
+Homepage "1" *-- "0..3" Avviso
 
 Articolo "0..*" --> "0..*" Iniziativa : riguarda
 Evento "0..*" --> "0..*" Iniziativa : riguarda
@@ -149,11 +159,14 @@ note right of InformazioniAssociazione
     mostrate solo se complete.
 end note
 
-note right of Avvisi
+note right of Homepage
     Documento singleton "homeSettings" in Sanity.
-    Nello Studio appare come "Avvisi".
-    L'ordine della lista è quello mostrato
-    nella homepage; senza avvisi visibili la sezione non appare.
+    Nello Studio appare come "Homepage".
+    "sectionOrder" ordina le sei sezioni sotto la presentazione.
+    Senza configurazione resta l'ordine predefinito.
+    Non cambia l'ordine dei singoli contenuti.
+    La lista degli avvisi conserva il proprio ordine;
+    senza avvisi visibili la sezione non appare.
     La data di scadenza è inclusa (fuso Europe/Rome).
 end note
 

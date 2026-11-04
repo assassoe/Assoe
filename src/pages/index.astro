@@ -1,19 +1,15 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import BrandEyebrow from '@/components/BrandEyebrow.astro';
-import ArticleList from '@/components/ArticleList.astro';
+import HomeSections from '@/components/HomeSections.astro';
 import ContentImage from '@/components/ContentImage.astro';
 import HomeHeroIntro from '@/components/HomeHeroIntro.astro';
-import HomeNotices from '@/components/HomeNotices.astro';
-import InitiativeAreaSection from '@/components/InitiativeAreaSection.astro';
 import { contentRepository } from '@/content';
-import { formatDateTime } from '@/utils/date';
 import { getNextEvent } from '@/utils/events';
-import { ARTICLES_TITLE, BRAND_WORDMARK, SITE_NAME } from '@/config/site';
+import { SITE_NAME } from '@/config/site';
 import { sitePath } from '@/utils/sitePath';
-import { groupInitiatives } from '@/utils/initiatives';
 
-const [notices, initiatives, articles, events, association] = await Promise.all([
+const [homeSections, notices, initiatives, articles, events, association] = await Promise.all([
+  contentRepository.listHomeSections(),
   contentRepository.listHomeNotices(),
   contentRepository.listInitiatives(),
   contentRepository.listArticles(),
@@ -43,64 +39,6 @@ const featuredEvent = getNextEvent(events);
       </div>
     </section>
 
-    <HomeNotices notices={notices} />
-
-    {featuredEvent && (
-      <section class="section container" aria-labelledby="eventi-home">
-        <div class="section__header">
-          <div>
-            <BrandEyebrow />
-            <h2 id="eventi-home">Il prossimo appuntamento</h2>
-            <p class="section__intro">Incontri, attività e momenti da condividere.</p>
-          </div>
-          <a class="text-link" href={sitePath('/eventi/')}>Vedi tutti gli eventi <span aria-hidden="true">↗</span></a>
-        </div>
-        <article class="event-feature">
-          <div class="event-feature__media">
-            {featuredEvent.imageUrl ? (
-              <ContentImage src={featuredEvent.imageUrl} alt={`Locandina di ${featuredEvent.title}`} variant="poster" />
-            ) : (
-              <div class="event-feature__placeholder" aria-hidden="true">{BRAND_WORDMARK}</div>
-            )}
-          </div>
-          <div class="event-feature__body">
-            <p class="eyebrow">Ci vediamo presto</p>
-            <h3>{featuredEvent.title}</h3>
-            <p><time datetime={featuredEvent.date}>{formatDateTime(featuredEvent.date)}</time></p>
-            {featuredEvent.place && <p>{featuredEvent.place}</p>}
-            <a class="button" href={sitePath(`/eventi/${featuredEvent.slug}/`)}>Scopri l’evento</a>
-          </div>
-        </article>
-      </section>
-    )}
-
-    {groupInitiatives(initiatives).map((group) => <InitiativeAreaSection group={group} home />)}
-
-    <section class="section container" aria-labelledby="articoli-home">
-      <div class="section__header">
-        <div>
-          <p class="eyebrow">Dal territorio</p>
-          <h2 id="articoli-home">{ARTICLES_TITLE}</h2>
-          <p class="section__intro">Racconti e aggiornamenti da leggere con calma.</p>
-        </div>
-        <a class="text-link" href={sitePath('/articoli/')}>Sfoglia gli articoli <span aria-hidden="true">↗</span></a>
-      </div>
-      {
-        articles.length > 0 ? (
-          <ArticleList articles={articles.slice(0, 3)} />
-        ) : (
-          <p class="notice">Per ora non ci sono articoli da leggere.</p>
-        )
-      }
-    </section>
-
-    <section class="container five-per-mille" aria-labelledby="cinque-per-mille-home">
-      <div>
-        <p class="eyebrow">5×1000</p>
-        <h2 id="cinque-per-mille-home">Il tuo 5×1000 può fare strada.</h2>
-        <p>Scopri come scegliere Asso è… e dove trovare il nostro codice fiscale.</p>
-      </div>
-      <a class="button" href={sitePath('/sostienici/')}>Come fare</a>
-    </section>
+    <HomeSections {homeSections} {notices} {initiatives} {articles} {featuredEvent} />
   </main>
 </BaseLayout>

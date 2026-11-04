@@ -140,6 +140,8 @@ export const peopleQuery = `*[
   "photoUrl": photo.asset->url
 }`;
 
+export const homeSectionOrderQuery = `*[_type == "homeSettings"][0].sectionOrder[] { section }`;
+
 export const homeNoticesQuery = `*[_type == "homeSettings"][0].notices[] {
   _key,
   title,
