@@ -2,6 +2,7 @@
   "name": "assoe-volontariato-studio",
   "version": "0.1.0",
   "private": true,
+  "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "dev": "sanity dev",
@@ -19,10 +20,10 @@
     "styled-components": "^6.6.0"
   },
   "overrides": {
-    "chokidar": "^5.0.0",
     "@module-federation/dts-plugin": {
       "undici": "^7.30.1"
     },
+    "chokidar": "^5.0.0",
     "@vercel/frameworks": {
       "js-yaml": "^4.1.1",
       "smol-toml": "^1.9.1"

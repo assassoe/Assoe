@@ -23,9 +23,16 @@ jobs:
     env:
       PUBLIC_SANITY_PROJECT_ID: ${{ vars.PUBLIC_SANITY_PROJECT_ID }}
       PUBLIC_SANITY_DATASET: ${{ vars.PUBLIC_SANITY_DATASET || 'production' }}
+      # ATTIVO: anteprima GitHub Pages, valida anche dopo il trasferimento.
       PUBLIC_SITE_PREVIEW: 'true'
       SITE_URL: https://${{ github.repository_owner }}.github.io
       SITE_BASE: /${{ github.event.repository.name }}/
+
+      # FUTURO: assoe.it. Commentare le tre righe sopra e decommentare queste.
+      # Prima dell'attivazione configurare il dominio in GitHub Pages e i DNS.
+      # PUBLIC_SITE_PREVIEW: 'false'
+      # SITE_URL: https://assoe.it
+      # SITE_BASE: /
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
