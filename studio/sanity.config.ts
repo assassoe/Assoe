@@ -5,6 +5,7 @@ import { schemaTypes } from './schemaTypes';
 import { PERSON_ROLE_GROUPS } from '../shared/personRoles';
 import { markdownSchema } from 'sanity-plugin-markdown';
 import { createInitiativesStructure, initiativeTemplates } from './structure/initiatives';
+import { createEventsStructure, eventInitiativeTemplate } from './structure/events';
 
 export default defineConfig({
   name: 'assoe-volontariato',
@@ -50,7 +51,9 @@ export default defineConfig({
                             ),
                           ]),
                       )
-                    : item,
+                    : item.getId() === 'event'
+                      ? createEventsStructure(S)
+                      : item,
               ),
           ]),
     }),
@@ -63,6 +66,7 @@ export default defineConfig({
     templates: (previous) => [
       ...previous.filter(({ id }) => id !== 'initiative'),
       ...initiativeTemplates,
+      eventInitiativeTemplate,
     ],
   },
 });
