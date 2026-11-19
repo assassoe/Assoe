@@ -1,5 +1,6 @@
 import { toHTML } from '@portabletext/to-html';
 import { articlePublicSlug } from '../../utils/articleSlug.ts';
+import { EVENT_RESERVED_SLUGS, isValidSlug } from '../../../shared/slug.ts';
 import { sanitizeRichTextHtml } from '../../utils/sanitizeHtml.ts';
 import {
   emailAddressOrUndefined,
@@ -67,6 +68,9 @@ export function toArticleSummary(article: SanityArticle): ArticleSummary {
     summary: article.summary ?? undefined,
     publishedAt: article.publishedAt,
     imageUrl: sanityAssetUrlOrUndefined(article.imageUrl),
+    ...(isValidSlug(article.legacyEventSlug, { reserved: EVENT_RESERVED_SLUGS })
+      ? { legacyEventSlug: article.legacyEventSlug }
+      : {}),
   };
 }
 

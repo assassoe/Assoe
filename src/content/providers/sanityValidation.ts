@@ -30,6 +30,7 @@ export interface SanityArticle {
   summary: string | null;
   publishedAt: string;
   imageUrl: string | null;
+  legacyEventSlug?: unknown;
 }
 
 export interface SanityArticleDetail extends SanityArticle {
@@ -55,6 +56,7 @@ export interface SanityEventDetail extends SanityEvent {
   galleryImageUrls: Array<string | null> | null;
   facebookPostUrl: string | null;
   initiatives: Array<SanityRelatedInitiative | null> | null;
+  articles?: unknown;
 }
 
 export interface SanityPerson {

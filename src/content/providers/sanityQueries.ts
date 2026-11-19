@@ -23,6 +23,7 @@ const articleFields = `_id,
   "slug": slug.current,
   summary,
   publishedAt,
+  legacyEventSlug,
   "imageUrl": mainImage.asset->url`;
 
 const eventFields = `_id,
@@ -123,6 +124,12 @@ export const eventBySlugQuery = `*[
   "galleryImageUrls": gallery[].asset->url,
   "initiatives": initiatives[]-> {
     ${relatedInitiativeFields}
+  },
+  "articles": *[
+    _type == "article" && event._ref == ^._id &&
+    defined(title) && defined(slug.current) && defined(publishedAt)
+  ] | order(publishedAt desc, _id asc) {
+    ${articleFields}
   }
 }`;
 

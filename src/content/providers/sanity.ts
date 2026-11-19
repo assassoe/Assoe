@@ -176,6 +176,7 @@ export function createSanityRepository(
         discussionUrl: facebookPostUrlOrUndefined(event.facebookPostUrl),
         galleryImageUrls: safeSanityAssetUrls(event.galleryImageUrls),
         relatedInitiatives: toRelatedInitiatives(event.initiatives),
+        relatedArticles: (Array.isArray(event.articles) ? event.articles : []).filter(isSanityArticle).map(toArticleSummary),
       };
     },
 

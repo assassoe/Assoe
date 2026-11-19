@@ -25,6 +25,7 @@ const dimensions: Record<Variant, { width: number; height: number; fit: 'cover' 
 };
 
 const { width, height, fit } = dimensions[variant];
+const format = src.split(/[?#]/, 1)[0].toLowerCase().endsWith('.svg') ? 'svg' : undefined;
 const originalSize = fit === 'contain' ? await getRemoteImageSize(src) : null;
 const outputHeight = originalSize ? Math.max(1, Math.round(width * originalSize.height / originalSize.width)) : height;
 ---
@@ -32,6 +33,7 @@ const outputHeight = originalSize ? Math.max(1, Math.round(width * originalSize.
 {fit === 'cover' ? (
   <Image
     src={src}
+    format={format}
     alt={alt}
     width={width}
     height={height}
@@ -45,6 +47,7 @@ const outputHeight = originalSize ? Math.max(1, Math.round(width * originalSize.
 ) : (
   <Image
     src={src}
+    format={format}
     alt={alt}
     width={width}
     height={outputHeight}

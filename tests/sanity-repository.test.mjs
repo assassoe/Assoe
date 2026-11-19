@@ -228,3 +228,14 @@ test('un errore Sanity viene propagato e non impedisce il tentativo successivo',
   assert.equal((await repository.listEvents())[0].id, 'event-1');
   assert.equal(fetch.mock.callCount(), 2);
 });
+
+test('gli eventi espongono i racconti validi con URL datati e filtrano quelli corrotti', async () => {
+  for (const articles of [undefined, null, {}, []]) {
+    const { repository } = setup({ [queries.eventBySlugQuery]: { ...eventDetail, articles } });
+    assert.deepEqual((await repository.getEventBySlug('evento')).relatedArticles, []);
+  }
+  const { repository } = setup({ [queries.eventBySlugQuery]: {
+    ...eventDetail, articles: [article, null, { ...article, publishedAt: 'non valida' }],
+  } });
+  assert.deepEqual((await repository.getEventBySlug('evento')).relatedArticles.map(({ slug }) => slug), ['2026-10-20-articolo']);
+});
