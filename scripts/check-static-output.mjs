@@ -10,9 +10,12 @@ const allowedRedirects = new Map([
   [path.join('dist', 'contatti', 'index.html'), `${redirectBase}/chi-siamo/#contatti`],
 ]);
 
-function expectedRedirect(relativePath) {
+function expectedRedirect(relativePath, target) {
   const staticRedirect = allowedRedirects.get(relativePath);
   if (staticRedirect) return staticRedirect;
+  if (/^dist\/eventi\/[a-z0-9-]+\/index\.html$/.test(relativePath)
+    && target.startsWith(`${redirectBase}/articoli/`)
+    && outputFileForHref(target, path.resolve(relativePath))) return target;
 
   return undefined;
 }
@@ -122,7 +125,7 @@ for (const filePath of pages) {
   const redirectTarget = html.match(/<meta http-equiv="refresh" content="0;url=([^"]+)"/i)?.[1];
 
   if (redirectTarget) {
-    const destination = expectedRedirect(relativePath);
+    const destination = expectedRedirect(relativePath, redirectTarget);
     if (destination !== redirectTarget) {
       throw new Error(`${relativePath}: redirect non previsto.`);
     }

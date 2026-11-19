@@ -29,6 +29,13 @@ export const article = defineType({
         .custom(validateUniqueSlug),
     }),
     defineField({ name: 'summary', title: 'Sommario', type: 'text', rows: 3 }),
+    defineField({
+      name: 'legacyEventSlug',
+      title: 'Slug dell’evento precedente',
+      type: 'string',
+      hidden: true,
+      readOnly: true,
+    }),
     defineField({ name: 'body', title: 'Testo', type: 'richText' }),
     facebookPostField,
     defineField({

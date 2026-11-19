@@ -24,6 +24,7 @@ export interface ArticleSummary {
   summary?: string;
   publishedAt: string;
   imageUrl?: string;
+  legacyEventSlug?: string;
 }
 
 export interface ArticleDetail extends ArticleSummary {
@@ -52,6 +53,7 @@ export interface EventDetail extends EventSummary {
   galleryImageUrls: string[];
   discussionUrl?: string;
   relatedInitiatives: InitiativeSummary[];
+  relatedArticles: ArticleSummary[];
 }
 
 export type PersonRole = import('../../shared/personRoles').PersonRole;
