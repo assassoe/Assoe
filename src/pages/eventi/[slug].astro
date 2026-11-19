@@ -3,6 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import ContentImage from '@/components/ContentImage.astro';
 import DetailGallery from '@/components/DetailGallery.astro';
+import ArticleList from '@/components/ArticleList.astro';
 import RichTextContent from '@/components/RichTextContent.astro';
 import InitiativeList from '@/components/InitiativeList.astro';
 import RelatedContentSection from '@/components/RelatedContentSection.astro';
@@ -16,10 +17,21 @@ import { sitePath } from '@/utils/sitePath';
 import { eventDisplayStatus, isEventArchived } from '@/utils/events';
 
 export const getStaticPaths = (async () => {
-  const events = await contentRepository.listEvents();
+  const [events, articles] = await Promise.all([
+    contentRepository.listEvents(), contentRepository.listArticles(),
+  ]);
+  const eventSlugs = new Set(events.map(({ slug }) => slug));
 
-  return staticPathsFromSlugs(events);
+  return [
+    ...staticPathsFromSlugs(events),
+    ...articles.filter((article) => article.legacyEventSlug && !eventSlugs.has(article.legacyEventSlug))
+      .map((article) => ({ params: { slug: article.legacyEventSlug! }, props: { articleSlug: article.slug } })),
+  ];
 }) satisfies GetStaticPaths;
+
+interface Props { articleSlug?: string }
+const { articleSlug } = Astro.props;
+if (articleSlug) return Astro.redirect(sitePath(`/articoli/${articleSlug}/`), 301);
 
 const slug = Astro.params.slug;
 const event = await requireBySlug(slug, contentRepository.getEventBySlug, 'Evento');
@@ -43,6 +55,12 @@ const archived = isEventArchived(event);
       {event.imageUrl && <div class="detail__image detail__image--poster"><ContentImage src={event.imageUrl} alt={`Locandina: ${event.title}`} variant="poster" eager /></div>}
       <RichTextContent html={event.descriptionHtml} />
       <DetailGallery id="galleria-evento" title="Le foto" imageAlt={event.title} imageUrls={event.galleryImageUrls} />
+
+      {event.relatedArticles.length > 0 && (
+        <RelatedContentSection id="racconti-evento" title="Il racconto dell’evento" description="Le esperienze e le foto di questa giornata.">
+          <ArticleList articles={event.relatedArticles} />
+        </RelatedContentSection>
+      )}
 
       {event.discussionUrl && <FacebookDiscussion url={event.discussionUrl} />}
 

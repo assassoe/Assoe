@@ -27,9 +27,10 @@ const association = providedAssociation === undefined
   ? await contentRepository.getAssociationInfo()
   : providedAssociation;
 let favicon = null;
+const svgLogo = association?.logoUrl?.split(/[?#]/, 1)[0].toLowerCase().endsWith('.svg');
 if (association?.logoUrl) {
   try {
-    favicon = await getImage({ src: association.logoUrl, width: 64, height: 64, fit: 'contain', format: 'png' });
+    favicon = await getImage({ src: association.logoUrl, width: 64, height: 64, fit: 'contain', format: svgLogo ? 'svg' : 'png' });
   } catch {
     // Il logo remoto non deve impedire il rendering della pagina.
   }
@@ -46,7 +47,7 @@ const isCurrent = (href: string) => href === homePath ? currentPath === homePath
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    {favicon && <link rel="icon" type="image/png" href={favicon.src} />}
+    {favicon && <link rel="icon" type={svgLogo ? 'image/svg+xml' : 'image/png'} href={favicon.src} />}
     {import.meta.env.PUBLIC_SITE_PREVIEW === 'true' && <meta name="robots" content="noindex,nofollow" />}
     <title>{title}</title>
   </head>

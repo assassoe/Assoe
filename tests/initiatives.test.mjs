@@ -137,3 +137,27 @@ test('riordinare un ambito mantiene invariato l’ordine dell’altro, anche dop
   assert.deepEqual(afterReorder[1].initiatives.map(({ id }) => id), ['banco', 'convenzioni', 'premio']);
   assert.equal((await repo.getInitiativeBySlug('premio')).slug, 'premio');
 });
+
+test('la query dell’evento trova soltanto gli articoli che raccontano quell’appuntamento', async () => {
+  const dataset = [
+    { _id: 'evento', _type: 'event', title: 'Evento', slug: { current: 'evento' }, date: '2026-10-20T12:00:00Z', status: 'completed' },
+    { _id: 'altro', _type: 'event', title: 'Altro', slug: { current: 'altro' }, date: '2026-10-19T12:00:00Z', status: 'completed' },
+    ...[
+      ['primo', 'evento', '2026-10-20T15:00:00Z'],
+      ['secondo', 'evento', '2026-10-21T15:00:00Z'],
+      ['estraneo', 'altro', '2026-10-22T15:00:00Z'],
+      ['senza-evento', null, '2026-10-23T15:00:00Z'],
+    ].map(([id, eventId, date]) => ({
+      _id: id, _type: 'article', title: id, slug: { current: id }, publishedAt: date,
+      ...(eventId ? { event: { _type: 'reference', _ref: eventId } } : {}),
+    })),
+    { _id: 'incompleto', _type: 'article', event: { _type: 'reference', _ref: 'evento' } },
+  ];
+  const repo = repository(dataset);
+  const detail = await repo.getEventBySlug('evento');
+  assert.deepEqual(detail.relatedArticles.map(({ id, slug }) => [id, slug]), [
+    ['secondo', '2026-10-21-secondo'], ['primo', '2026-10-20-primo'],
+  ]);
+  assert.equal((await repo.getArticleBySlug('2026-10-20-primo')).relatedEvent.id, 'evento');
+  assert.deepEqual((await repository(dataset.slice(0, 2)).getEventBySlug('evento')).relatedArticles, []);
+});

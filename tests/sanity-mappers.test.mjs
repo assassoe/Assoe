@@ -231,3 +231,11 @@ test('normalizza galleria, rich text e impostazioni associative incomplete', () 
     },
   });
 });
+
+test('i vecchi indirizzi evento si mantengono solo per slug sicuri e non riservati', () => {
+  const article = { _id: 'art', title: 'Storia', slug: 'storia', publishedAt: '2026-10-20T12:00:00Z', summary: null, imageUrl: null };
+  assert.equal(toArticleSummary({ ...article, legacyEventSlug: 'raccolta-coperte-2021' }).legacyEventSlug, 'raccolta-coperte-2021');
+  for (const legacyEventSlug of [undefined, null, 42, '', 'archivio', '../contatti', 'https://evil.example', 'con spazio']) {
+    assert.equal(toArticleSummary({ ...article, legacyEventSlug }).legacyEventSlug, undefined);
+  }
+});
