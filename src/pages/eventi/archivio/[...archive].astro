@@ -3,6 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import ArchiveLayout from '@/layouts/ArchiveLayout.astro';
 import EventArchiveSections from '@/components/EventArchiveSections.astro';
 import EventNavigation from '@/components/EventNavigation.astro';
+import DropdownNav from '@/components/DropdownNav.astro';
 import { contentRepository } from '@/content';
 import { eventArchivePages } from '@/utils/eventArchive';
 import { sitePath } from '@/utils/sitePath';
@@ -23,13 +24,22 @@ const title = page.year ? `Archivio eventi · ${page.year}` : 'Archivio eventi';
   <Fragment slot="navigation">
     <EventNavigation archive />
     {page.years.length > 0 && (
-      <nav class="event-archive__nav" aria-label="Archivio per anno">
-        <a href={sitePath('/eventi/archivio/')} aria-current={!page.year ? 'page' : undefined}>Tutti gli anni</a>
-        {page.years.map((year) => (
-          <a href={sitePath(`/eventi/archivio/${year}/`)} aria-current={page.year === year ? 'page' : undefined}>{year}</a>
-        ))}
-      </nav>
+      <div class="event-archive__filter">
+        <DropdownNav
+          label="Anno"
+          navigationLabel="Archivio per anno"
+          currentHref={sitePath(page.basePath)}
+          items={[
+            { label: 'Tutti gli anni', href: sitePath('/eventi/archivio/') },
+            ...page.years.map((year) => ({ label: year, href: sitePath(`/eventi/archivio/${year}/`) })),
+          ]}
+        />
+      </div>
     )}
   </Fragment>
   <EventArchiveSections events={page.events} />
 </ArchiveLayout>
+
+<style>
+  .event-archive__filter { margin-bottom: 1.7rem; }
+</style>
