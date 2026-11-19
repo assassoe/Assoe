@@ -14,7 +14,7 @@ import { formatDateTime } from '@/utils/date';
 import { eventStatusLabel } from '@/utils/labels';
 import { SITE_NAME } from '@/config/site';
 import { sitePath } from '@/utils/sitePath';
-import { eventDisplayStatus, isEventArchived } from '@/utils/events';
+import { eventDisplayStatus } from '@/utils/events';
 
 export const getStaticPaths = (async () => {
   const [events, articles] = await Promise.all([
@@ -35,12 +35,11 @@ if (articleSlug) return Astro.redirect(sitePath(`/articoli/${articleSlug}/`), 30
 
 const slug = Astro.params.slug;
 const event = await requireBySlug(slug, contentRepository.getEventBySlug, 'Evento');
-const archived = isEventArchived(event);
 ---
 
 <BaseLayout title={`${event.title} | ${SITE_NAME}`}>
   <main id="contenuto" class="container detail">
-    <a class="text-link" href={sitePath(archived ? '/eventi/archivio/' : '/eventi/')}>← {archived ? 'Archivio eventi' : 'Eventi in programma'}</a>
+    <a class="text-link" href={sitePath('/eventi/')}>← Tutti gli eventi</a>
     <article>
       <header class="detail__header">
         <p class="eyebrow">Evento</p>

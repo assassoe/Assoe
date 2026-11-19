@@ -270,12 +270,8 @@ p { line-height: 1.65; }
 .support-method__bank-details dt { color: var(--green-dark); font-size: .72rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .support-method__bank-details dd { margin: .4rem 0 0; font-weight: 700; line-height: 1.5; overflow-wrap: anywhere; }
 .support-method__iban { font-family: 'Epilogue Variable', system-ui, sans-serif; font-size: clamp(1.05rem, 2vw, 1.4rem); letter-spacing: .03em; }
-.event-archive__nav { display: flex; flex-wrap: wrap; gap: .65rem; margin-bottom: 1.7rem; }
-.event-archive__nav a { display: inline-flex; align-items: center; min-height: 2.75rem; padding: .65rem .9rem; border: 1px solid var(--line); border-radius: .65rem; background: var(--card); color: var(--green-dark); font-size: .88rem; font-weight: 800; text-decoration: none; }
-.event-archive__nav a:hover { border-color: var(--green); background: var(--surface-muted); }
-.event-archive__nav a[aria-current='page'] { border-color: var(--green-dark); background: var(--green-dark); color: var(--card); }
 .event-archive__group + .event-archive__group { margin-top: 3.5rem; }
-.event-archive__group h2 { margin-bottom: 1.2rem; font-size: clamp(1.5rem, 2.5vw, 2.1rem); }
+.event-archive__group > :is(h2, h3) { margin-bottom: 1.2rem; font-size: clamp(1.5rem, 2.5vw, 2.1rem); }
 .pagination { display: grid; justify-items: center; gap: 1rem; margin-top: 2rem; }
 .pagination__status { margin: 0; color: var(--muted); font-size: .88rem; font-weight: 700; }
 .pagination__controls, .pagination__pages { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .45rem; }

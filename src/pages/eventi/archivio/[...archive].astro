@@ -1,45 +1,22 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import ArchiveLayout from '@/layouts/ArchiveLayout.astro';
-import EventArchiveSections from '@/components/EventArchiveSections.astro';
-import EventNavigation from '@/components/EventNavigation.astro';
-import DropdownNav from '@/components/DropdownNav.astro';
+import EventsPage from '@/components/EventsPage.astro';
 import { contentRepository } from '@/content';
+import type { EventSummary } from '@/content/types';
 import { eventArchivePages } from '@/utils/eventArchive';
-import { sitePath } from '@/utils/sitePath';
+import { getNextEvent } from '@/utils/events';
 
 export const getStaticPaths = (async () => {
-  const pages = eventArchivePages(await contentRepository.listEvents());
-  return pages.map((page) => ({ params: { archive: page.route }, props: { page } }));
+  const events = await contentRepository.listEvents();
+  const nextEvent = getNextEvent(events);
+  return eventArchivePages(events).map((page) => ({ params: { archive: page.route }, props: { page, nextEvent } }));
 }) satisfies GetStaticPaths;
 
 interface Props {
   page: ReturnType<typeof eventArchivePages>[number];
+  nextEvent?: EventSummary;
 }
-const { page } = Astro.props;
-const title = page.year ? `Archivio eventi · ${page.year}` : 'Archivio eventi';
+const { page, nextEvent } = Astro.props;
 ---
 
-<ArchiveLayout title={title} description="Gli eventi passati, raccolti per anno dal più recente." emptyMessage="Non ci sono ancora eventi da mostrare nell’archivio." basePath={page.basePath} currentPage={page.currentPage} totalItems={page.totalItems}>
-  <Fragment slot="navigation">
-    <EventNavigation archive />
-    {page.years.length > 0 && (
-      <div class="event-archive__filter">
-        <DropdownNav
-          label="Anno"
-          navigationLabel="Archivio per anno"
-          currentHref={sitePath(page.basePath)}
-          items={[
-            { label: 'Tutti gli anni', href: sitePath('/eventi/archivio/') },
-            ...page.years.map((year) => ({ label: year, href: sitePath(`/eventi/archivio/${year}/`) })),
-          ]}
-        />
-      </div>
-    )}
-  </Fragment>
-  <EventArchiveSections events={page.events} />
-</ArchiveLayout>
-
-<style>
-  .event-archive__filter { margin-bottom: 1.7rem; }
-</style>
+<EventsPage {...page} nextEvent={nextEvent} basePath={page.year ? page.basePath : '/eventi/'} />
