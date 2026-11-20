@@ -70,6 +70,7 @@ export function toArticleSummary(article: SanityArticle): ArticleSummary {
     summary: article.summary ?? undefined,
     publishedAt: article.publishedAt,
     ...(article.historicalUndated === true ? { historicalUndated: true } : {}),
+    ...(article.featured === true ? { featured: true } : {}),
     imageUrl: sanityAssetUrlOrUndefined(article.imageUrl),
     ...(isValidSlug(article.legacyEventSlug, { reserved: EVENT_RESERVED_SLUGS })
       ? { legacyEventSlug: article.legacyEventSlug }

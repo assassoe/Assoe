@@ -30,6 +30,7 @@ export interface SanityArticle {
   summary: string | null;
   publishedAt: string;
   historicalUndated?: unknown;
+  featured?: unknown;
   imageUrl: string | null;
   legacyEventSlug?: unknown;
   legacyArticleSlugs?: unknown;

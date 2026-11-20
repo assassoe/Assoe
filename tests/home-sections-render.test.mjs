@@ -27,8 +27,8 @@ test('la homepage genera le sezioni nell’ordine editoriale conservando contenu
     initiatives: ['social', 'volunteering'].flatMap((area) => [1, 2, 3].map((index) => ({
       id: `${area}-${index}`, slug: `${area}-${index}`, name: `${area} ${index}`, area,
     }))),
-    articles: [1, 2, 3, 4].map((index) => ({
-      id: `article-${index}`, slug: `2026-11-04-articolo-${index}`, title: `Articolo ${index}`, publishedAt: '2026-11-04T10:00:00Z',
+    articles: [1, 2, 3, 4, 5, 6, 7].map((index) => ({
+      id: `article-${index}`, slug: `2026-11-0${index}-articolo-${index}`, title: `Articolo ${index}`, publishedAt: `2026-11-0${index}T10:00:00Z`, featured: index <= 6,
     })),
     featuredEvent: { id: 'event', slug: 'evento', title: 'Prossimo evento', date: '2026-12-08T16:00:00Z', status: 'scheduled' },
   };
@@ -37,6 +37,7 @@ test('la homepage genera le sezioni nell’ordine editoriale conservando contenu
     reordered: { ...content, homeSections: reversed },
     historical: { ...content, articles: [{ ...content.articles[0], slug: 'ricordo', historicalUndated: true }] },
     empty: { homeSections: reversed, notices: [], initiatives: [], articles: [] },
+    noFeatured: { ...content, articles: content.articles.map(({ featured, ...article }) => article) },
   })) {
     fs.writeFileSync(path.join(fixture, 'src/pages', `${name}.astro`), `---
 import HomeSections from '../components/HomeSections.astro';
@@ -47,6 +48,10 @@ const props = ${JSON.stringify(props)};
   <HomeSections {...props} />
 </main></body></html>`);
   }
+  fs.writeFileSync(path.join(fixture, 'src/pages/archive.astro'), `---
+import ArticleList from '../components/ArticleList.astro';
+---
+<ArticleList articles={${JSON.stringify(content.articles)}} />`);
   await build({
     root: fixture,
     configFile: false,
@@ -65,7 +70,13 @@ const props = ${JSON.stringify(props)};
   const reordered = document('reordered');
   assert.deepEqual(sectionIds(reordered), ['hero', ...expected.toReversed()]);
   assert.deepEqual([...reordered.querySelectorAll('[aria-labelledby="iniziative-social"] h3')].map((node) => node.textContent), ['social 1', 'social 2']);
-  assert.deepEqual([...reordered.querySelectorAll('[aria-labelledby="articoli-home"] h3')].map((node) => node.textContent), ['Articolo 1', 'Articolo 2', 'Articolo 3']);
+  assert.deepEqual([...reordered.querySelectorAll('[aria-labelledby="articoli-home"] h3')].map((node) => node.textContent), ['Articolo 6', 'Articolo 5', 'Articolo 4', 'Articolo 3', 'Articolo 2']);
+  assert.equal(reordered.querySelectorAll('.article-list--featured .article-list__star[aria-hidden="true"]').length, 5);
+  assert.equal(document('noFeatured').querySelector('.article-list'), null);
+  assert.match(document('noFeatured').querySelector('[aria-labelledby="articoli-home"] .notice').textContent, /Nessun articolo in evidenza/);
+  const archive = document('archive');
+  assert.equal(archive.querySelectorAll('.article-list__item').length, 7);
+  assert.equal(archive.querySelector('.article-list--featured, .article-list__star'), null);
   assert.equal(reordered.querySelector('[aria-labelledby="eventi-home"] h3').textContent, 'Prossimo evento');
   assert.deepEqual(sectionIds(document('empty')), ['hero', 'cinque-per-mille-home', 'articoli-home', 'iniziative-volunteering', 'iniziative-social']);
 });

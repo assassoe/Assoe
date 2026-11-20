@@ -3,25 +3,27 @@ import ArticleList from './ArticleList.astro';
 import type { ArticleSummary } from '@/content/types';
 import { ARTICLES_TITLE } from '@/config/site';
 import { sitePath } from '@/utils/sitePath';
+import { selectFeaturedArticles } from '@/utils/featuredArticles';
 
 interface Props { articles: ArticleSummary[]; }
 const { articles } = Astro.props;
+const featured = selectFeaturedArticles(articles);
 ---
 
 <section class="section container" aria-labelledby="articoli-home">
   <div class="section__header">
     <div>
-      <p class="eyebrow">Dal territorio</p>
+      <p class="eyebrow home-articles__eyebrow">In evidenza</p>
       <h2 id="articoli-home">{ARTICLES_TITLE}</h2>
-      <p class="section__intro">Racconti e aggiornamenti da leggere con calma.</p>
+      <p class="section__intro">Una selezione di storie che raccontano il nostro impegno.</p>
     </div>
     <a class="text-link" href={sitePath('/articoli/')}>Sfoglia gli articoli <span aria-hidden="true">↗</span></a>
   </div>
   {
-    articles.length > 0 ? (
-      <ArticleList articles={articles.slice(0, 3)} />
+    featured.length > 0 ? (
+      <ArticleList articles={featured} variant="featured" />
     ) : (
-      <p class="notice">Per ora non ci sono articoli da leggere.</p>
+      <p class="notice">Nessun articolo in evidenza per il momento.</p>
     )
   }
 </section>

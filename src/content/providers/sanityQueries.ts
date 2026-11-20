@@ -24,6 +24,7 @@ const articleFields = `_id,
   summary,
   publishedAt,
   historicalUndated,
+  featured,
   legacyEventSlug,
   legacyArticleSlugs,
   "imageUrl": mainImage.asset->url`;
