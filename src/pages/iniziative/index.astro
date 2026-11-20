@@ -1,23 +1,5 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro';
-import BrandEyebrow from '@/components/BrandEyebrow.astro';
-import InitiativeAreaNav from '@/components/InitiativeAreaNav.astro';
-import InitiativeAreaSection from '@/components/InitiativeAreaSection.astro';
-import { contentRepository } from '@/content';
-import { groupInitiatives } from '@/utils/initiatives';
-import { SITE_NAME } from '@/config/site';
+import { sitePath } from '@/utils/sitePath';
 
-const groups = groupInitiatives(await contentRepository.listInitiatives());
+return Astro.redirect(sitePath('/'), 301);
 ---
-
-<BaseLayout title={`Iniziative | ${SITE_NAME}`}>
-  <main id="contenuto" class="container">
-    <div class="page-intro">
-      <BrandEyebrow />
-      <h1>Iniziative</h1>
-      <p>Due ambiti, un impegno comune per la comunità. Scegli quello che vuoi conoscere.</p>
-    </div>
-    <InitiativeAreaNav />
-    {groups.map((group) => <InitiativeAreaSection group={group} />)}
-  </main>
-</BaseLayout>

@@ -3,27 +3,28 @@ import ArticleList from './ArticleList.astro';
 import type { ArticleSummary } from '@/content/types';
 import { ARTICLES_TITLE } from '@/config/site';
 import { sitePath } from '@/utils/sitePath';
-import { selectFeaturedArticles } from '@/utils/featuredArticles';
+import { selectHomeArticles } from '@/utils/featuredArticles';
 
 interface Props { articles: ArticleSummary[]; }
 const { articles } = Astro.props;
-const featured = selectFeaturedArticles(articles);
+const selected = selectHomeArticles(articles);
+const hasFeatured = selected.some(({ featured }) => featured === true);
 ---
 
 <section class="section container" aria-labelledby="articoli-home">
   <div class="section__header">
     <div>
-      <p class="eyebrow home-articles__eyebrow">In evidenza</p>
+      <p class="eyebrow home-articles__eyebrow">{hasFeatured ? 'In evidenza' : 'Ultimi articoli'}</p>
       <h2 id="articoli-home">{ARTICLES_TITLE}</h2>
-      <p class="section__intro">Una selezione di storie che raccontano il nostro impegno.</p>
+      <p class="section__intro">{hasFeatured ? 'Una selezione di storie che raccontano il nostro impegno.' : 'Le storie più recenti delle nostre attività.'}</p>
     </div>
     <a class="text-link" href={sitePath('/articoli/')}>Sfoglia gli articoli <span aria-hidden="true">↗</span></a>
   </div>
   {
-    featured.length > 0 ? (
-      <ArticleList articles={featured} variant="featured" />
+    selected.length > 0 ? (
+      <ArticleList articles={selected} variant={hasFeatured ? 'featured' : 'default'} />
     ) : (
-      <p class="notice">Nessun articolo in evidenza per il momento.</p>
+      <p class="notice">Non ci sono ancora articoli pubblicati.</p>
     )
   }
 </section>

@@ -7,6 +7,7 @@ const redirectBase = siteBase === '/' ? '' : `/${siteBase.replace(/^\/+|\/+$/g, 
 const allowedRedirects = new Map([
   [path.join('dist', '404.html'), `${redirectBase}/`],
   [path.join('dist', '5x1000', 'index.html'), `${redirectBase}/sostienici/`],
+  [path.join('dist', 'iniziative', 'index.html'), `${redirectBase}/`],
   [path.join('dist', 'contatti', 'index.html'), `${redirectBase}/chi-siamo/#contatti`],
 ]);
 
