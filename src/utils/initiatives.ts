@@ -29,9 +29,8 @@ export function groupInitiatives(initiatives: readonly InitiativeSummary[]) {
   }));
 }
 
-/** I due archivi appartengono alla stessa voce principale del menu. */
+/** Ogni ambito mantiene attiva la propria voce del menu, anche nelle pagine successive. */
 export function initiativeNavigationPath(pathname: string, base = import.meta.env?.BASE_URL ?? '/') {
-  return initiativeSections.some(({ path }) => pathname.startsWith(sitePath(path, base)))
-    ? sitePath('/iniziative/', base)
-    : pathname;
+  const section = initiativeSections.find(({ path }) => pathname.startsWith(sitePath(path, base)));
+  return section ? sitePath(section.path, base) : pathname;
 }

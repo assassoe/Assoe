@@ -82,6 +82,7 @@ p { line-height: 1.65; }
 .site-header .brand__main { color: var(--surface); }
 .site-header .brand__sub { color: var(--green-soft); }
 .desktop-nav { display: flex; align-items: center; gap: 1.3rem; }
+.desktop-nav a { white-space: nowrap; }
 .desktop-nav a, .mobile-nav a { color: var(--surface); text-decoration: none; font-size: .9rem; font-weight: 700; }
 .desktop-nav a:hover, .mobile-nav a:hover { color: var(--green-soft); }
 .desktop-nav a[aria-current='page'], .mobile-nav a[aria-current='page'] { color: var(--green-soft); text-decoration: underline; text-underline-offset: .4em; }
@@ -99,6 +100,8 @@ p { line-height: 1.65; }
 .site-footer__links { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .25rem 1.2rem; font-size: .87rem; font-weight: 700; }
 .site-footer__links a { display: inline-flex; align-items: center; min-height: 2rem; color: var(--surface); text-decoration: none; white-space: nowrap; }
 .site-footer a:hover { color: var(--green-soft); text-decoration: underline; text-underline-offset: .25em; }
+.site-footer__links a, .site-footer__bottom .site-footer__contact-mobile { color: var(--yellow); }
+.site-footer__links a:hover, .site-footer__bottom .site-footer__contact-mobile:hover { color: var(--yellow-light); }
 .site-footer__bottom { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem 1.5rem; border-top: 1px solid var(--green); margin-top: 1rem; padding-top: .75rem; color: var(--green-soft); font-size: .75rem; }
 .site-footer__bottom nav { display: flex; flex-wrap: wrap; gap: .8rem 1.5rem; }
 .site-footer__bottom a { text-decoration: none; }
@@ -158,9 +161,18 @@ p { line-height: 1.65; }
 .initiative-list__link:hover .initiative-list__more { color: var(--red-dark); text-decoration: underline; text-underline-offset: .2em; }
 .initiative-list__media { display: flex; align-items: center; justify-content: center; align-self: center; width: 100%; height: 100%; max-height: 7.5rem; background: transparent; }
 .initiative-list__media .content-image { width: auto; height: auto; max-width: 100%; max-height: 7rem; object-fit: contain; background: transparent; }
-.section.home-initiatives { margin-top: 4.5rem; padding: clamp(1.5rem, 3vw, 2.5rem); border-radius: 1.5rem; background: var(--green-wash); }
+.section.home-initiatives { margin-top: 4.5rem; padding: clamp(1.5rem, 3vw, 2.5rem); border-radius: 1.5rem; }
+.home-initiatives--social { background: var(--card); border: 1px solid var(--line); }
+.section.home-initiatives--volunteering { padding: clamp(1.75rem, 4vw, 3rem); background: var(--green-dark); color: var(--card); }
 .home-initiatives .section__header { margin-bottom: 1.25rem; }
 .home-initiatives .section__header h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); }
+.home-initiatives--volunteering .section__header h2 { font-size: clamp(2rem, 3.6vw, 3.1rem); }
+.home-initiatives--volunteering .section__header .brand-eyebrow,
+.home-initiatives--volunteering .section__intro { color: var(--green-soft); }
+.home-initiatives--volunteering .section__header .text-link { color: var(--card); }
+.home-initiatives--volunteering .section__header .text-link:hover,
+.home-initiatives--volunteering .section__header .text-link > span { color: var(--green-soft); }
+.home-initiatives--volunteering .section__header :focus-visible { outline-color: var(--card); }
 .initiative-area-section + .initiative-area-section { margin-top: 2.5rem; }
 .initiative-area-nav { display: flex; flex-wrap: wrap; gap: .65rem; margin-bottom: 2rem; }
 .initiative-area-nav a { display: inline-flex; align-items: center; min-height: 2.75rem; padding: .65rem .9rem; border: 1px solid var(--line); border-radius: .65rem; background: var(--card); color: var(--green-dark); font-size: .88rem; font-weight: 800; text-decoration: none; }
@@ -232,19 +244,19 @@ p { line-height: 1.65; }
 .about-contact__panel:not(.about-contact__panel--split) { max-width: 38rem; }
 .about-contact__panel--split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(2rem, 4vw, 4rem); }
 .about-contact__place { scroll-margin-top: 1.5rem; }
-.about-contact__place .eyebrow { color: var(--red-soft); }
+.about-contact__place .eyebrow { color: var(--yellow); }
 .about-contact__place h2 { margin-bottom: 1rem; font-size: clamp(1.7rem, 2.5vw, 2.35rem); }
 .about-contact__place address { display: grid; gap: .2rem; font-size: clamp(1.05rem, 1.5vw, 1.2rem); font-style: normal; line-height: 1.5; }
 .about-contact__place > p:not(.eyebrow) { margin-bottom: 0; }
 .about-contact__registry { max-width: 36rem; color: var(--green-soft); font-size: .85rem; }
 .about-contact__channels { min-width: 0; padding-left: clamp(2rem, 4vw, 4rem); border-left: 1px solid var(--green); }
-.about-contact__channels h3 { margin: .1rem 0 1.35rem; font-size: 1.15rem; }
+.about-contact__channels h3 { margin: .1rem 0 1.35rem; color: var(--yellow); font-size: 1.15rem; }
 .about-contact__channels dl, .about-contact__channels dd { margin: 0; }
 .about-contact__channels dl { display: grid; gap: 1.15rem; }
-.about-contact__channels dt { margin-bottom: .25rem; color: var(--green-soft); font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.about-contact__channels dt { margin-bottom: .25rem; color: var(--yellow); font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 .about-contact__channels dd { overflow-wrap: anywhere; }
-.about-contact__channels a { color: var(--surface); text-decoration-color: var(--green-soft); text-underline-offset: .25em; }
-.about-contact__channels a:hover { color: var(--red-soft); }
+.about-contact__channels a { color: var(--surface); text-decoration-color: var(--yellow); text-underline-offset: .25em; }
+.about-contact__channels a:hover { color: var(--yellow-light); }
 .about-contact__channels ul { display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; padding: 0; margin: 0; list-style: none; }
 .about-contact :focus-visible { outline-color: var(--surface); }
 .support-page__intro { max-width: 49rem; padding-bottom: 1.5rem; }
@@ -358,7 +370,7 @@ p { line-height: 1.65; }
   .initiative-list:not(.initiative-list--single) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-@media (max-width: 850px) {
+@media (max-width: 1050px) {
   .desktop-nav { display: none; }
   .mobile-nav { display: block; position: relative; }
   .mobile-nav summary { display: grid; place-items: center; width: 2.8rem; height: 2.8rem; cursor: pointer; list-style: none; }

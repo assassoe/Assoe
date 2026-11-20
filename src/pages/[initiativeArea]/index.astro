@@ -1,7 +1,6 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import ArchiveLayout from '@/layouts/ArchiveLayout.astro';
-import InitiativeAreaNav from '@/components/InitiativeAreaNav.astro';
 import InitiativeList from '@/components/InitiativeList.astro';
 import { contentRepository } from '@/content';
 import { groupInitiatives } from '@/utils/initiatives';
@@ -19,6 +18,5 @@ const { group } = Astro.props;
 ---
 
 <ArchiveLayout title={group.title} description={group.description} emptyMessage={group.emptyMessage} basePath={group.path} currentPage={1} totalItems={group.initiatives.length}>
-  <InitiativeAreaNav slot="navigation" current={group.value} />
   <InitiativeList initiatives={group.initiatives.slice(0, ARCHIVE_PAGE_SIZE)} headingLevel={2} showArea={false} />
 </ArchiveLayout>
