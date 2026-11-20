@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import InitiativeAreaNav from '@/components/InitiativeAreaNav.astro';
 import BrandEyebrow from '@/components/BrandEyebrow.astro';
 import ContentImage from '@/components/ContentImage.astro';
 import JoinUsCta from '@/components/JoinUsCta.astro';
@@ -44,7 +45,7 @@ const phoneHref = telephoneHrefOrUndefined(contacts?.phone);
           <p class="eyebrow">L’associazione</p>
           <h2 id="storia-associazione">Il nostro impegno</h2>
           {aboutParagraphs.map((paragraph) => <p>{paragraph}</p>)}
-          <a class="text-link" href={sitePath('/iniziative/')}>Scopri le nostre iniziative ↗</a>
+          <InitiativeAreaNav />
         </div>
         {association?.aboutImageUrl && (
           <div class="about-story__media"><ContentImage src={association.aboutImageUrl} alt="" variant="gallery" /></div>

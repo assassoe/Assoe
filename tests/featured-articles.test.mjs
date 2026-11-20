@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { evaluate, parse } from 'groq-js';
-import { selectFeaturedArticles } from '../src/utils/featuredArticles.ts';
+import { selectFeaturedArticles, selectHomeArticles } from '../src/utils/featuredArticles.ts';
 import { MAX_FEATURED_ARTICLES } from '../shared/featuredArticles.ts';
 import { featuredArticleIdsQuery, validateFeaturedArticle } from '../studio/schemaTypes/featuredArticles.ts';
 import { toArticleSummary } from '../src/content/providers/sanityMappers.ts';
@@ -80,4 +80,20 @@ test('disattivazione e campo assente non richiedono rete; gli errori di verifica
     assert.match(await validateFeaturedArticle(true, { document: { _id: 'id' }, getClient: () => ({ fetch: async () => result }) }), /Non è stato possibile/);
   }
   assert.match(await validateFeaturedArticle(true, { document: { _id: 'id' }, getClient: () => ({ fetch: async () => { throw new Error('offline'); } }) }), /Non è stato possibile/);
+});
+
+
+test('senza preferiti la home mostra gli ultimi tre senza modificare l’elenco ricevuto', () => {
+  const input = Object.freeze([article('vecchio', { publishedAt: '2020-01-01T10:00:00Z' }), article('secondo', { publishedAt: '2024-01-01T10:00:00Z' }), article('ultimo', { publishedAt: '2026-01-01T10:00:00Z' }), article('terzo', { publishedAt: '2023-01-01T10:00:00Z' })].map(Object.freeze));
+  assert.deepEqual(selectHomeArticles(input).map(a => a.id), ['ultimo', 'secondo', 'terzo']);
+  assert.equal(input[0].id, 'vecchio');
+  assert.deepEqual(selectHomeArticles([]), []);
+  assert.deepEqual(selectHomeArticles(input.slice(0, 2)).map(a => a.id), ['secondo', 'vecchio']);
+  assert.deepEqual(selectHomeArticles([...input, article('scelto', { featured: true })]).map(a => a.id), ['scelto']);
+});
+
+test('il ripiego sui recenti conserva i ricordi senza data in fondo e risolve le parità', () => {
+  const input = [article('storico', { historicalUndated: true, publishedAt: '2026-11-20T10:00:00Z' }), article('b'), article('a'), article('vecchio', { publishedAt: '2010-01-01T10:00:00Z' })];
+  assert.deepEqual(selectHomeArticles(input).map(a => a.id), ['a', 'b', 'vecchio']);
+  assert.deepEqual(selectHomeArticles(input.slice(0, 2)).map(a => a.id), ['b', 'storico']);
 });

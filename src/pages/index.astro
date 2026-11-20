@@ -27,7 +27,8 @@ const featuredEvent = getNextEvent(events);
         <div class="hero__text">
           <HomeHeroIntro name={association?.name ?? SITE_NAME} shortDescription={association?.shortDescription} />
           <div class="hero__actions">
-            <a class="button" href={sitePath('/iniziative/')}>Scopri le iniziative</a>
+            <a class="button" href={sitePath('/volontariato/')}>Volontariato</a>
+            <a class="button button--light" href={sitePath('/iniziative-sociali/')}>Iniziative sociali</a>
             <a class="button button--light" href={sitePath('/chi-siamo/')}>Chi siamo</a>
           </div>
         </div>

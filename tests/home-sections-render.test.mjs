@@ -62,6 +62,16 @@ const association = ${JSON.stringify(association)};
 ---
 <html lang="it"><head><title>Adesione</title></head><body><JoinUsCta association={association} href="#contatti" /></body></html>`);
   }
+  const association = { name: 'Associazione', aboutText: 'Il nostro impegno.', contacts: {}, socialLinks: [], documents: {} };
+  fs.writeFileSync(path.join(fixture, 'src/content/index.ts'), `export const contentRepository = {
+    getAssociationInfo: async () => (${JSON.stringify(association)}), listPeople: async () => [],
+    listHomeSections: async () => ${JSON.stringify(defaults)}, listHomeNotices: async () => [],
+    listInitiatives: async () => [], listArticles: async () => [], listEvents: async () => [],
+  };`);
+  fs.copyFileSync(path.join(project, 'src/pages/chi-siamo.astro'), path.join(fixture, 'src/pages/chi-siamo.astro'));
+  fs.copyFileSync(path.join(project, 'src/pages/index.astro'), path.join(fixture, 'src/pages/index.astro'));
+  fs.mkdirSync(path.join(fixture, 'src/pages/iniziative'), { recursive: true });
+  fs.copyFileSync(path.join(project, 'src/pages/iniziative/index.astro'), path.join(fixture, 'src/pages/iniziative/index.astro'));
   await build({
     root: fixture,
     configFile: false,
@@ -69,7 +79,7 @@ const association = ${JSON.stringify(association)};
     logLevel: 'silent',
     vite: { resolve: { alias: { '@': path.join(fixture, 'src') } } },
   });
-  const document = (name) => new JSDOM(fs.readFileSync(path.join(fixture, 'dist', name, 'index.html'), 'utf8')).window.document;
+  const document = (name) => new JSDOM(fs.readFileSync(path.join(fixture, 'dist', ...(name === 'index' ? ['index.html'] : [name, 'index.html'])), 'utf8')).window.document;
   const sectionIds = (doc) => [...doc.querySelectorAll('main > section')]
     .map((section) => section.getAttribute('aria-labelledby') ?? section.className);
   const expected = ['avvisi-home', 'eventi-home', 'iniziative-social', 'iniziative-volunteering', 'articoli-home', 'cinque-per-mille-home'];
@@ -80,13 +90,22 @@ const association = ${JSON.stringify(association)};
   assert.ok(document('membership').querySelector('a[href="https://cdn.sanity.io/files/project/production/form.pdf"]'));
   assert.match(document('membership').body.textContent, /esaminata dal direttivo/);
   assert.equal(document('contact').querySelector('a[href*="form.pdf"]'), null);
+  for (const [name, selector] of [['chi-siamo', '[aria-labelledby="storia-associazione"]'], ['index', '.hero__actions']]) {
+    const area = document(name).querySelector(selector);
+    assert.ok(area.querySelector('a[href="/Assoe/volontariato/"]'));
+    assert.ok(area.querySelector('a[href="/Assoe/iniziative-sociali/"]'));
+    assert.equal(area.querySelector('a[href="/Assoe/iniziative/"]'), null);
+  }
+  assert.equal(document('iniziative').querySelector('meta[http-equiv="refresh"]').content, '0;url=/Assoe/');
   const reordered = document('reordered');
   assert.deepEqual(sectionIds(reordered), ['hero', ...expected.toReversed()]);
   assert.deepEqual([...reordered.querySelectorAll('[aria-labelledby="iniziative-social"] h3')].map((node) => node.textContent), ['social 1', 'social 2']);
   assert.deepEqual([...reordered.querySelectorAll('[aria-labelledby="articoli-home"] h3')].map((node) => node.textContent), ['Articolo 6', 'Articolo 5', 'Articolo 4', 'Articolo 3', 'Articolo 2']);
   assert.equal(reordered.querySelectorAll('.article-list--featured .article-list__star[aria-hidden="true"]').length, 5);
-  assert.equal(document('noFeatured').querySelector('.article-list'), null);
-  assert.match(document('noFeatured').querySelector('[aria-labelledby="articoli-home"] .notice').textContent, /Nessun articolo in evidenza/);
+  assert.deepEqual([...document('noFeatured').querySelectorAll('[aria-labelledby="articoli-home"] h3')].map(node => node.textContent), ['Articolo 7', 'Articolo 6', 'Articolo 5']);
+  assert.equal(document('noFeatured').querySelector('.article-list__star'), null);
+  assert.equal(document('noFeatured').querySelector('.home-articles__eyebrow').textContent, 'Ultimi articoli');
+  assert.match(document('empty').querySelector('[aria-labelledby="articoli-home"] .notice').textContent, /Non ci sono ancora articoli/);
   const archive = document('archive');
   assert.equal(archive.querySelectorAll('.article-list__item').length, 7);
   assert.equal(archive.querySelector('.article-list--featured, .article-list__star'), null);
