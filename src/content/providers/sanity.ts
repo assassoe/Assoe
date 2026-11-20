@@ -149,7 +149,7 @@ export function createSanityRepository(
       const article = await client.fetch<unknown>(articleByIdQuery, { id: summary.id });
 
       if (!isSanityArticleDetail(article)) return null;
-      if (articlePublicSlug(article.slug, article.publishedAt) !== slug) return null;
+      if (articlePublicSlug(article.slug, article.publishedAt, article.historicalUndated === true) !== slug) return null;
 
       return {
         ...toArticleSummary(article),

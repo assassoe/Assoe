@@ -23,7 +23,9 @@ const articleFields = `_id,
   "slug": slug.current,
   summary,
   publishedAt,
+  historicalUndated,
   legacyEventSlug,
+  legacyArticleSlugs,
   "imageUrl": mainImage.asset->url`;
 
 const eventFields = `_id,
@@ -59,7 +61,7 @@ export const articlesByInitiativeQuery = `*[
   defined(title) &&
   defined(slug.current) &&
   defined(publishedAt)
-] | order(publishedAt desc) {
+] | order(coalesce(historicalUndated, false) asc, publishedAt desc) {
   ${articleFields}
 }`;
 
@@ -79,7 +81,7 @@ export const articlesQuery = `*[
   defined(title) &&
   defined(slug.current) &&
   defined(publishedAt)
-] | order(publishedAt desc) {
+] | order(coalesce(historicalUndated, false) asc, publishedAt desc) {
   ${articleFields}
 }`;
 
@@ -128,7 +130,7 @@ export const eventBySlugQuery = `*[
   "articles": *[
     _type == "article" && event._ref == ^._id &&
     defined(title) && defined(slug.current) && defined(publishedAt)
-  ] | order(publishedAt desc, _id asc) {
+  ] | order(coalesce(historicalUndated, false) asc, publishedAt desc, _id asc) {
     ${articleFields}
   }
 }`;
