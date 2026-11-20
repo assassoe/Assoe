@@ -1,5 +1,6 @@
 import { toHTML } from '@portabletext/to-html';
 import { articlePublicSlug } from '../../utils/articleSlug.ts';
+import { validArticleAliases } from '../../../shared/articleSlug.ts';
 import { EVENT_RESERVED_SLUGS, isValidSlug } from '../../../shared/slug.ts';
 import { sanitizeRichTextHtml } from '../../utils/sanitizeHtml.ts';
 import {
@@ -61,16 +62,19 @@ export function renderRichText(blocks: unknown): string | undefined {
 }
 
 export function toArticleSummary(article: SanityArticle): ArticleSummary {
+  const aliases = validArticleAliases(article.legacyArticleSlugs);
   return {
     id: article._id,
     title: article.title,
-    slug: articlePublicSlug(article.slug, article.publishedAt),
+    slug: articlePublicSlug(article.slug, article.publishedAt, article.historicalUndated === true),
     summary: article.summary ?? undefined,
     publishedAt: article.publishedAt,
+    ...(article.historicalUndated === true ? { historicalUndated: true } : {}),
     imageUrl: sanityAssetUrlOrUndefined(article.imageUrl),
     ...(isValidSlug(article.legacyEventSlug, { reserved: EVENT_RESERVED_SLUGS })
       ? { legacyEventSlug: article.legacyEventSlug }
       : {}),
+    ...(aliases.length ? { legacyArticleSlugs: aliases } : {}),
   };
 }
 

@@ -1,5 +1,5 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
-import { ARTICLE_SLUG_MAX_LENGTH, articleSlugError } from '../../shared/articleSlug';
+import { ARTICLE_SLUG_MAX_LENGTH, articleSlugError, isArticlePublicSlug } from '../../shared/articleSlug';
 import { MAX_GALLERY_IMAGES } from '../../shared/imageSize';
 import { validateEditorialImageSize } from './editorialImage';
 import { isArticleSlugUnique, validateUniqueSlug } from './slugValidation';
@@ -30,6 +30,15 @@ export const article = defineType({
     }),
     defineField({ name: 'summary', title: 'Sommario', type: 'text', rows: 3 }),
     defineField({
+      name: 'legacyArticleSlugs',
+      title: 'Indirizzi precedenti dell’articolo',
+      type: 'array',
+      hidden: true,
+      readOnly: true,
+      of: [defineArrayMember({ type: 'string', validation: (rule) => rule.custom((value) => isArticlePublicSlug(value) || 'Indirizzo articolo non valido.') })],
+      validation: (rule) => rule.unique(),
+    }),
+    defineField({
       name: 'legacyEventSlug',
       title: 'Slug dell’evento precedente',
       type: 'string',
@@ -56,10 +65,16 @@ export const article = defineType({
       validation: (rule) => rule.max(MAX_GALLERY_IMAGES),
     }),
     defineField({
+      name: 'historicalUndated',
+      title: 'Ricordo storico senza data verificata',
+      type: 'boolean',
+      description: 'Attiva solo per materiale storico privo di una data attendibile. Il sito omette la data e la rimuove dall’URL, conservando il vecchio collegamento nel registro degli indirizzi precedenti. Il racconto segue gli articoli datati negli elenchi.',
+    }),
+    defineField({
       name: 'publishedAt',
       title: 'Data pubblicazione',
       type: 'datetime',
-      description: 'Questa data compare anche nell’URL pubblico. Dopo la pubblicazione, cambiarla modifica il link.',
+      description: 'La data compare sul sito e nell’URL, salvo i ricordi storici senza data verificata. Prima di modificarla conserva il vecchio indirizzo nel registro di migrazione.',
       validation: (rule) => rule.required(),
     }),
     defineField({

@@ -239,3 +239,13 @@ test('gli eventi espongono i racconti validi con URL datati e filtrano quelli co
   } });
   assert.deepEqual((await repository.getEventBySlug('evento')).relatedArticles.map(({ slug }) => slug), ['2026-10-20-articolo']);
 });
+
+
+test('un ricordo senza data si legge con lo slug storico senza esporre la data di importazione', async () => {
+  const { repository } = setup({
+    [queries.articlesQuery]: [{ ...article, historicalUndated: true }],
+    [queries.articleByIdQuery]: { ...articleDetail, historicalUndated: true },
+  });
+  assert.equal((await repository.getArticleBySlug('articolo')).historicalUndated, true);
+  assert.equal(await repository.getArticleBySlug('2026-10-20-articolo'), null);
+});
