@@ -96,6 +96,7 @@ export interface AssociationInfo {
   socialLinks: Array<{ name: string; url: string }>;
   documents: {
     statuteUrl?: string;
+    membershipFormUrl?: string;
     regulationUrl?: string;
     privacyPolicyUrl?: string;
     cookiePolicyUrl?: string;

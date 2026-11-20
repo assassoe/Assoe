@@ -17,7 +17,11 @@ const contactHref = href.startsWith('#') ? href : sitePath(href);
     <div class="about-join__panel">
       <div class="about-join__copy">
         <h2 id="unisciti-associazione">Vuoi unirti a noi?</h2>
-        <p>Ti piacerebbe dare una mano? Scrivici e raccontaci come vorresti partecipare.</p>
+        {association?.documents.membershipFormUrl ? (
+          <p>Leggi lo statuto, compila la <a href={association.documents.membershipFormUrl}>domanda di iscrizione (PDF)</a> e inviala all’associazione. La richiesta viene esaminata dal direttivo prima dell’ammissione.</p>
+        ) : (
+          <p>Ti piacerebbe dare una mano? Scrivici e raccontaci come vorresti partecipare.</p>
+        )}
       </div>
       <a class="button" href={contactHref}>Contattaci</a>
     </div>

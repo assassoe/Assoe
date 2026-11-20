@@ -77,6 +77,13 @@ export const siteSettings = defineType({
       of: [{ type: 'socialLink' }],
     }),
     defineField({
+      name: 'membershipForm',
+      title: 'Domanda di iscrizione PDF',
+      description: 'Modulo vuoto da compilare e inviare all’associazione. Non caricare domande compilate o documenti personali.',
+      type: 'file',
+      options: { accept: 'application/pdf' },
+    }),
+    defineField({
       name: 'statute',
       title: 'Statuto PDF',
       type: 'file',

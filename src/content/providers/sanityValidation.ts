@@ -104,6 +104,7 @@ export interface SanityAssociation {
   } | null;
   socialLinks?: Array<{ platform: string; url: string } | null> | null;
   statuteUrl?: string | null;
+  membershipFormUrl?: string | null;
   regulationUrl?: string | null;
   privacyPolicyUrl?: string | null;
   cookiePolicyUrl?: string | null;
@@ -250,6 +251,7 @@ export function isSanityAssociation(value: unknown): value is SanityAssociation 
     'registryInfo',
     'copyright',
     'statuteUrl',
+    'membershipFormUrl',
     'regulationUrl',
     'privacyPolicyUrl',
     'cookiePolicyUrl',

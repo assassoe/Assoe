@@ -182,6 +182,7 @@ export const associationQuery = `*[_type == "siteSettings" && defined(associatio
   },
   socialLinks[] { platform, url },
   "statuteUrl": statute.asset->url,
+  "membershipFormUrl": membershipForm.asset->url,
   "regulationUrl": regulation.asset->url,
   "privacyPolicyUrl": privacyPolicy.asset->url,
   "cookiePolicyUrl": cookiePolicy.asset->url

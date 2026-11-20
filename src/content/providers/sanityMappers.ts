@@ -147,6 +147,7 @@ export function toAssociationInfo(info: SanityAssociation): AssociationInfo {
     }),
     documents: {
       statuteUrl: sanityAssetUrlOrUndefined(info.statuteUrl),
+      ...(sanityAssetUrlOrUndefined(info.membershipFormUrl) ? { membershipFormUrl: sanityAssetUrlOrUndefined(info.membershipFormUrl) } : {}),
       regulationUrl: sanityAssetUrlOrUndefined(info.regulationUrl),
       privacyPolicyUrl: sanityAssetUrlOrUndefined(info.privacyPolicyUrl),
       cookiePolicyUrl: sanityAssetUrlOrUndefined(info.cookiePolicyUrl),
