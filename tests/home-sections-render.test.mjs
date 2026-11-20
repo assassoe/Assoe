@@ -35,6 +35,7 @@ test('la homepage genera le sezioni nell’ordine editoriale conservando contenu
   for (const [name, props] of Object.entries({
     default: content,
     reordered: { ...content, homeSections: reversed },
+    historical: { ...content, articles: [{ ...content.articles[0], slug: 'ricordo', historicalUndated: true }] },
     empty: { homeSections: reversed, notices: [], initiatives: [], articles: [] },
   })) {
     fs.writeFileSync(path.join(fixture, 'src/pages', `${name}.astro`), `---
@@ -58,6 +59,9 @@ const props = ${JSON.stringify(props)};
     .map((section) => section.getAttribute('aria-labelledby') ?? section.className);
   const expected = ['avvisi-home', 'eventi-home', 'iniziative-social', 'iniziative-volunteering', 'articoli-home', 'cinque-per-mille-home'];
   assert.deepEqual(sectionIds(document('default')), ['hero', ...expected]);
+  const historical = document('historical');
+  assert.equal(historical.querySelector('[aria-labelledby="articoli-home"] time'), null);
+  assert.equal(historical.querySelector('[aria-labelledby="articoli-home"] .article-list__link').getAttribute('href'), '/Assoe/articoli/ricordo/');
   const reordered = document('reordered');
   assert.deepEqual(sectionIds(reordered), ['hero', ...expected.toReversed()]);
   assert.deepEqual([...reordered.querySelectorAll('[aria-labelledby="iniziative-social"] h3')].map((node) => node.textContent), ['social 1', 'social 2']);

@@ -23,8 +23,10 @@ export interface ArticleSummary {
   slug: string;
   summary?: string;
   publishedAt: string;
+  historicalUndated?: boolean;
   imageUrl?: string;
   legacyEventSlug?: string;
+  legacyArticleSlugs?: string[];
 }
 
 export interface ArticleDetail extends ArticleSummary {

@@ -13,7 +13,7 @@ const allowedRedirects = new Map([
 function expectedRedirect(relativePath, target) {
   const staticRedirect = allowedRedirects.get(relativePath);
   if (staticRedirect) return staticRedirect;
-  if (/^dist\/eventi\/[a-z0-9-]+\/index\.html$/.test(relativePath)
+  if (/^dist\/(?:eventi\/[a-z0-9-]+|articoli\/[a-z0-9-]+)\/index\.html$/.test(relativePath)
     && target.startsWith(`${redirectBase}/articoli/`)
     && outputFileForHref(target, path.resolve(relativePath))) return target;
 

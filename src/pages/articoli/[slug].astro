@@ -10,15 +10,20 @@ import RelatedContentSection from '@/components/RelatedContentSection.astro';
 import FacebookDiscussion from '@/components/FacebookDiscussion.astro';
 import { contentRepository } from '@/content';
 import { formatDate } from '@/utils/date';
-import { requireBySlug, staticPathsFromSlugs } from '@/utils/content';
+import { requireBySlug } from '@/utils/content';
+import { articleStaticPaths } from '@/utils/articleRedirects';
 import { SITE_NAME } from '@/config/site';
 import { sitePath } from '@/utils/sitePath';
 
 export const getStaticPaths = (async () => {
   const articles = await contentRepository.listArticles();
 
-  return staticPathsFromSlugs(articles);
+  return articleStaticPaths(articles);
 }) satisfies GetStaticPaths;
+
+interface Props { articleSlug?: string }
+const { articleSlug } = Astro.props;
+if (articleSlug) return Astro.redirect(sitePath(`/articoli/${articleSlug}/`), 301);
 
 const slug = Astro.params.slug;
 const article = await requireBySlug(slug, contentRepository.getArticleBySlug, 'Articolo');
@@ -31,7 +36,7 @@ const article = await requireBySlug(slug, contentRepository.getArticleBySlug, 'A
       <header class="detail__header">
         <p class="eyebrow">Articolo</p>
         <h1>{article.title}</h1>
-        <p class="detail__meta"><time datetime={article.publishedAt}>{formatDate(article.publishedAt)}</time></p>
+        {!article.historicalUndated && <p class="detail__meta"><time datetime={article.publishedAt}>{formatDate(article.publishedAt)}</time></p>}
       </header>
 
       <DetailLead imageUrl={article.imageUrl} imageAlt={`Immagine dell’articolo ${article.title}`} hasText={Boolean(article.summary || article.bodyHtml)}>

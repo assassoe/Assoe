@@ -29,8 +29,10 @@ export interface SanityArticle {
   slug: string;
   summary: string | null;
   publishedAt: string;
+  historicalUndated?: unknown;
   imageUrl: string | null;
   legacyEventSlug?: unknown;
+  legacyArticleSlugs?: unknown;
 }
 
 export interface SanityArticleDetail extends SanityArticle {

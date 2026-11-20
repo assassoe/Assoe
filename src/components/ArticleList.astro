@@ -16,7 +16,7 @@ const { articles, headingLevel = 3 } = Astro.props;
   {articles.map((article) => (
     <li class="article-list__item">
       <a class:list={['article-list__link', { 'article-list__link--text-only': !article.imageUrl }]} href={sitePath(`/articoli/${article.slug}/`)}>
-        <time class="article-list__date" datetime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
+        {!article.historicalUndated && <time class="article-list__date" datetime={article.publishedAt}>{formatDate(article.publishedAt)}</time>}
         <div class="article-list__content">
           {headingLevel === 2 ? <h2>{article.title}</h2> : <h3>{article.title}</h3>}
           {article.summary && <p>{article.summary}</p>}
