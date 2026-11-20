@@ -36,7 +36,7 @@ PUBLIC_SANITY_PROJECT_ID=<id-progetto>
 PUBLIC_SANITY_DATASET=production
 ```
 
-Avviare il server di sviluppo:
+Avviare il server di sviluppo su `http://localhost:4322/`:
 
 ```bash
 npm run dev
@@ -65,7 +65,7 @@ Avviare lo Studio:
 npm run dev
 ```
 
-Per lavorare sugli stessi contenuti, sito e Studio devono puntare allo stesso progetto e dataset. Le modifiche pubblicate dallo Studio locale aggiornano il dataset configurato: utilizzare un dataset separato per contenuti di prova.
+Per lavorare sugli stessi contenuti, sito e Studio devono puntare allo stesso progetto e dataset. Le modifiche pubblicate dallo Studio locale aggiornano il dataset configurato: utilizzare un dataset separato per contenuti di prova. Gli elenchi e i dettagli delle iniziative del server di sviluppo rileggono Sanity a ogni richiesta: ricaricare la pagina recepisce aggiunte, eliminazioni e spostamenti, compresi i cambiamenti della paginazione.
 
 I file `.env` sono esclusi da Git. Credenziali, token e dati riservati devono restare fuori dal repository e dalle variabili esposte al browser.
 
@@ -137,9 +137,9 @@ I comandi seguenti si eseguono dalla radice del repository, dopo aver installato
 | `npm run test:coverage` | Verifica la copertura dei test e le soglie configurate |
 | `npm run build` | Genera il sito statico in `dist/` |
 | `npm run check:build` | Verifica pagine, collegamenti e struttura dell’ultima build |
-| `npm run preview` | Serve in locale l’ultima build |
+| `npm run preview` | Serve l’ultima build su `http://localhost:4323/` |
 
-La generazione del sito richiede la configurazione Sanity e una connessione di rete per leggere i contenuti e scaricare le immagini. Le immagini sono ottimizzate durante la build.
+La generazione del sito richiede la configurazione Sanity e una connessione di rete per leggere i contenuti e scaricare le immagini. Le immagini sono ottimizzate durante la build. La preview legge i file di `dist/` e cambia soltanto dopo una nuova build; per lavorare sui contenuti Sanity usare il server di sviluppo sulla porta 4322.
 
 Per verificare lo Studio, con le sue dipendenze già installate:
 

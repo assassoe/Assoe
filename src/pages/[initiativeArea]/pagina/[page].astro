@@ -1,26 +1,26 @@
 ---
-import type { GetStaticPaths, Page } from 'astro';
+import type { GetStaticPaths } from 'astro';
 import ArchiveLayout from '@/layouts/ArchiveLayout.astro';
 import InitiativeList from '@/components/InitiativeList.astro';
 import { contentRepository } from '@/content';
-import type { InitiativeSummary } from '@/content/types';
-import { groupInitiatives, initiativeSections } from '@/utils/initiatives';
+import { groupInitiatives } from '@/utils/initiatives';
 import { ARCHIVE_PAGE_SIZE } from '@/config/pagination';
+import { paginateArchive } from '@/utils/pagination';
+import { sitePath } from '@/utils/sitePath';
 
 export const getStaticPaths = (async ({ paginate }) => {
   const groups = groupInitiatives(await contentRepository.listInitiatives());
   return groups.flatMap((group) => paginate(group.initiatives, {
     pageSize: ARCHIVE_PAGE_SIZE,
     params: { initiativeArea: group.slug },
-    props: { group },
-  }).slice(1));
+  }).slice(1).map(({ params }) => ({ params })));
 }) satisfies GetStaticPaths;
 
-interface Props {
-  page: Page<InitiativeSummary>;
-  group: (typeof initiativeSections)[number];
-}
-const { group, page } = Astro.props;
+const group = groupInitiatives(await contentRepository.listInitiatives())
+  .find(({ slug }) => slug === Astro.params.initiativeArea);
+if (!group) return Astro.redirect(sitePath('/'), 302);
+const page = paginateArchive(group.initiatives, Number(Astro.params.page), ARCHIVE_PAGE_SIZE);
+if (!page || page.currentPage === 1) return Astro.redirect(sitePath(group.path), 302);
 ---
 
 <ArchiveLayout title={group.title} description={group.description} emptyMessage={group.emptyMessage} basePath={group.path} currentPage={page.currentPage} totalItems={page.total}>

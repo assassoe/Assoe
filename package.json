@@ -5,9 +5,9 @@
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=development astro dev",
+    "dev": "NODE_ENV=development astro dev --host 127.0.0.1 --port 4322",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "astro preview --host 127.0.0.1 --port 4323",
     "check": "astro check",
     "check:build": "node scripts/check-static-output.mjs",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",

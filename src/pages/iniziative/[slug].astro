@@ -9,7 +9,7 @@ import RichTextContent from '@/components/RichTextContent.astro';
 import RelatedContentSection from '@/components/RelatedContentSection.astro';
 import { contentRepository } from '@/content';
 import { formatDateTime } from '@/utils/date';
-import { requireBySlug, staticPathsFromSlugs } from '@/utils/content';
+import { staticPathsFromSlugs } from '@/utils/content';
 import { SITE_NAME } from '@/config/site';
 import { sitePath } from '@/utils/sitePath';
 import { initiativeSections } from '@/utils/initiatives';
@@ -21,7 +21,11 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths;
 
 const slug = Astro.params.slug;
-const initiative = await requireBySlug(slug, contentRepository.getInitiativeBySlug, 'Iniziativa');
+const initiative = slug ? await contentRepository.getInitiativeBySlug(slug) : null;
+if (!initiative) {
+  if (import.meta.env.DEV) return Astro.redirect(sitePath('/'), 302);
+  throw new Error(`Iniziativa non trovata durante la build: ${slug}`);
+}
 const section = initiativeSections.find(({ value }) => value === initiative.area)!;
 ---
 
