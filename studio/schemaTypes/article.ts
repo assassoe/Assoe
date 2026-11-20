@@ -6,6 +6,8 @@ import { isArticleSlugUnique, validateUniqueSlug } from './slugValidation';
 import { galleryDescription, imageDescription } from './imageDescriptions';
 import { GalleryInput } from './GalleryInput';
 import { facebookPostField } from './facebookPostField';
+import { validateFeaturedArticle } from './featuredArticles';
+import { MAX_FEATURED_ARTICLES } from '../../shared/featuredArticles';
 
 export const article = defineType({
   name: 'article',
@@ -29,6 +31,14 @@ export const article = defineType({
         .custom(validateUniqueSlug),
     }),
     defineField({ name: 'summary', title: 'Sommario', type: 'text', rows: 3 }),
+    defineField({
+      name: 'featured',
+      title: 'In evidenza nella homepage',
+      type: 'boolean',
+      initialValue: false,
+      description: `Attiva per scegliere questo articolo tra i preferiti della homepage, fino a ${MAX_FEATURED_ARTICLES} in totale. Pubblica l’articolo e ricostruisci il sito per aggiornare la selezione.`,
+      validation: (rule) => rule.custom(validateFeaturedArticle),
+    }),
     defineField({
       name: 'legacyArticleSlugs',
       title: 'Indirizzi precedenti dell’articolo',

@@ -24,6 +24,7 @@ export interface ArticleSummary {
   summary?: string;
   publishedAt: string;
   historicalUndated?: boolean;
+  featured?: boolean;
   imageUrl?: string;
   legacyEventSlug?: string;
   legacyArticleSlugs?: string[];

@@ -10,6 +10,7 @@ export const coverageIncludes = [
   'studio/schemaTypes/slugValidation.ts',
   'studio/schemaTypes/editorialImage.ts',
   'studio/schemaTypes/galleryUpload.ts',
+  'studio/schemaTypes/featuredArticles.ts',
 ];
 
 function sourceFiles(directory) {
