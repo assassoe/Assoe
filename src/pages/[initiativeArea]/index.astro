@@ -3,18 +3,17 @@ import type { GetStaticPaths } from 'astro';
 import ArchiveLayout from '@/layouts/ArchiveLayout.astro';
 import InitiativeList from '@/components/InitiativeList.astro';
 import { contentRepository } from '@/content';
-import { groupInitiatives } from '@/utils/initiatives';
+import { groupInitiatives, initiativeSections } from '@/utils/initiatives';
 import { ARCHIVE_PAGE_SIZE } from '@/config/pagination';
+import { sitePath } from '@/utils/sitePath';
 
 export const getStaticPaths = (async () => {
-  const groups = groupInitiatives(await contentRepository.listInitiatives());
-  return groups.map((group) => ({ params: { initiativeArea: group.slug }, props: { group } }));
+  return initiativeSections.map((group) => ({ params: { initiativeArea: group.slug } }));
 }) satisfies GetStaticPaths;
 
-interface Props {
-  group: ReturnType<typeof groupInitiatives>[number];
-}
-const { group } = Astro.props;
+const group = groupInitiatives(await contentRepository.listInitiatives())
+  .find(({ slug }) => slug === Astro.params.initiativeArea);
+if (!group) return Astro.redirect(sitePath('/'), 302);
 ---
 
 <ArchiveLayout title={group.title} description={group.description} emptyMessage={group.emptyMessage} basePath={group.path} currentPage={1} totalItems={group.initiatives.length}>
