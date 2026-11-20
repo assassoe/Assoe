@@ -19,6 +19,7 @@ const boardMembers = getBoardMembers(people);
 const aboutParagraphs = toParagraphs(association?.aboutText);
 
 const documents = association ? [
+  { label: 'Domanda di iscrizione', url: association.documents.membershipFormUrl },
   { label: 'Statuto', url: association.documents.statuteUrl },
   { label: 'Regolamento', url: association.documents.regulationUrl },
   { label: 'Informativa sulla privacy', url: association.documents.privacyPolicyUrl },

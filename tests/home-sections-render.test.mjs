@@ -52,6 +52,16 @@ const props = ${JSON.stringify(props)};
 import ArticleList from '../components/ArticleList.astro';
 ---
 <ArticleList articles={${JSON.stringify(content.articles)}} />`);
+  for (const [name, association] of Object.entries({
+    membership: { name: 'Associazione', contacts: { email: 'info@assoe.it' }, socialLinks: [], documents: { membershipFormUrl: 'https://cdn.sanity.io/files/project/production/form.pdf' } },
+    contact: { name: 'Associazione', contacts: { email: 'info@assoe.it' }, socialLinks: [], documents: {} },
+  })) {
+    fs.writeFileSync(path.join(fixture, 'src/pages', `${name}.astro`), `---
+import JoinUsCta from '../components/JoinUsCta.astro';
+const association = ${JSON.stringify(association)};
+---
+<html lang="it"><head><title>Adesione</title></head><body><JoinUsCta association={association} href="#contatti" /></body></html>`);
+  }
   await build({
     root: fixture,
     configFile: false,
@@ -67,6 +77,9 @@ import ArticleList from '../components/ArticleList.astro';
   const historical = document('historical');
   assert.equal(historical.querySelector('[aria-labelledby="articoli-home"] time'), null);
   assert.equal(historical.querySelector('[aria-labelledby="articoli-home"] .article-list__link').getAttribute('href'), '/Assoe/articoli/ricordo/');
+  assert.ok(document('membership').querySelector('a[href="https://cdn.sanity.io/files/project/production/form.pdf"]'));
+  assert.match(document('membership').body.textContent, /esaminata dal direttivo/);
+  assert.equal(document('contact').querySelector('a[href*="form.pdf"]'), null);
   const reordered = document('reordered');
   assert.deepEqual(sectionIds(reordered), ['hero', ...expected.toReversed()]);
   assert.deepEqual([...reordered.querySelectorAll('[aria-labelledby="iniziative-social"] h3')].map((node) => node.textContent), ['social 1', 'social 2']);
