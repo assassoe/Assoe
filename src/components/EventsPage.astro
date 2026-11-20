@@ -1,0 +1,67 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BrandEyebrow from './BrandEyebrow.astro';
+import DropdownNav from './DropdownNav.astro';
+import EventFeature from './EventFeature.astro';
+import EventArchiveSections from './EventArchiveSections.astro';
+import Pagination from './Pagination.astro';
+import type { EventSummary } from '@/content/types';
+import { ARCHIVE_PAGE_SIZE } from '@/config/pagination';
+import { SITE_NAME } from '@/config/site';
+import { sitePath } from '@/utils/sitePath';
+
+interface Props {
+  events: EventSummary[];
+  nextEvent?: EventSummary;
+  years: string[];
+  year?: string;
+  basePath?: string;
+  currentPage?: number;
+  totalItems: number;
+}
+
+const { events, nextEvent, years, year, basePath = '/eventi/', currentPage = 1, totalItems } = Astro.props;
+const title = year ? `Eventi · ${year}` : 'Eventi';
+const pageTitle = currentPage === 1 ? title : `${title} · Pagina ${currentPage}`;
+const lastPage = Math.ceil(totalItems / ARCHIVE_PAGE_SIZE);
+---
+
+<BaseLayout title={`${pageTitle} | ${SITE_NAME}`} description="Il prossimo appuntamento e gli eventi che abbiamo condiviso.">
+  <main id="contenuto" class="container">
+    <div class="page-intro">
+      <BrandEyebrow />
+      <h1>{title}</h1>
+      <p>Incontri, attività e momenti da condividere.</p>
+    </div>
+    {nextEvent && currentPage === 1 && (
+      <section class="events-page__next" aria-labelledby="prossimo-evento">
+        <h2 id="prossimo-evento">Il prossimo evento</h2>
+        <EventFeature event={nextEvent} />
+      </section>
+    )}
+    <section aria-labelledby="eventi-passati">
+      <div class="events-page__past-header">
+        <h2 id="eventi-passati">Eventi passati</h2>
+        {years.length > 0 && (
+          <DropdownNav
+            label="Anno"
+            navigationLabel="Eventi passati per anno"
+            currentHref={sitePath(basePath)}
+            items={[
+              { label: 'Tutti gli anni', href: sitePath('/eventi/') },
+              ...years.map((item) => ({ label: item, href: sitePath(`/eventi/archivio/${item}/`) })),
+            ]}
+          />
+        )}
+      </div>
+      {totalItems > 0 ? <EventArchiveSections events={events} headingLevel="h3" /> : <p class="notice">Non ci sono ancora eventi passati da mostrare.</p>}
+      {lastPage > 1 && <Pagination basePath={basePath} currentPage={currentPage} lastPage={lastPage} label="Eventi passati" />}
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .events-page__next { margin-bottom: 4rem; }
+  .events-page__past-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 2rem; }
+  .events-page__past-header h2 { margin: 0; }
+</style>

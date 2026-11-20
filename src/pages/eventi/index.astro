@@ -1,18 +1,12 @@
 ---
-import ArchiveLayout from '@/layouts/ArchiveLayout.astro';
-import EventGrid from '@/components/EventGrid.astro';
-import EventNavigation from '@/components/EventNavigation.astro';
+import EventsPage from '@/components/EventsPage.astro';
 import { contentRepository } from '@/content';
 import { ARCHIVE_PAGE_SIZE } from '@/config/pagination';
-import { groupEventsByDate } from '@/utils/events';
+import { getNextEvent, groupEventsByDate, groupEventsByYear } from '@/utils/events';
 
-const { future: events } = groupEventsByDate(await contentRepository.listEvents());
+const events = await contentRepository.listEvents();
+const { past } = groupEventsByDate(events);
+const years = groupEventsByYear(past).map(({ year }) => year);
 ---
 
-<ArchiveLayout title="Eventi" description="Gli appuntamenti di oggi e dei prossimi giorni." emptyMessage="Non ci sono appuntamenti in programma. Puoi ritrovare quelli passati nell’archivio eventi." basePath="/eventi/" currentPage={1} totalItems={events.length}>
-  <EventNavigation slot="navigation" />
-  <section class="event-archive__group" aria-labelledby="eventi-in-programma">
-    <h2 id="eventi-in-programma">In programma</h2>
-    <EventGrid events={events.slice(0, ARCHIVE_PAGE_SIZE)} />
-  </section>
-</ArchiveLayout>
+<EventsPage events={past.slice(0, ARCHIVE_PAGE_SIZE)} nextEvent={getNextEvent(events)} years={years} totalItems={past.length} />

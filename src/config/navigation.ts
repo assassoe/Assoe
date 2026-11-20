@@ -9,7 +9,8 @@ interface NavigationItem {
 
 const navigation = {
   home: { href: sitePath('/'), label: 'Home' },
-  initiatives: { href: sitePath('/iniziative/'), label: 'Iniziative' },
+  volunteering: { href: sitePath('/volontariato/'), label: 'Volontariato' },
+  social: { href: sitePath('/iniziative-sociali/'), label: 'Iniziative sociali' },
   events: { href: sitePath('/eventi/'), label: 'Eventi' },
   articles: { href: sitePath('/articoli/'), label: 'Articoli' },
   about: { href: sitePath('/chi-siamo/'), label: 'Chi siamo' },
@@ -18,7 +19,8 @@ const navigation = {
 
 export const siteNavigation: readonly NavigationItem[] = [
   navigation.home,
-  navigation.initiatives,
+  navigation.volunteering,
+  navigation.social,
   navigation.events,
   navigation.articles,
   navigation.about,

@@ -5,14 +5,16 @@ import { groupEventsByYear } from '@/utils/events';
 
 interface Props {
   events: EventSummary[];
+  headingLevel?: 'h2' | 'h3';
 }
 
 const groups = groupEventsByYear(Astro.props.events);
+const Heading = Astro.props.headingLevel ?? 'h2';
 ---
 
 {groups.map(({ year, events }) => (
   <section class="event-archive__group" aria-labelledby={`eventi-${year}`}>
-    <h2 id={`eventi-${year}`}>{year}</h2>
+    <Heading id={`eventi-${year}`}>{year}</Heading>
     <EventGrid events={events} />
   </section>
 ))}

@@ -1,0 +1,27 @@
+---
+import ContentImage from './ContentImage.astro';
+import type { EventSummary } from '@/content/types';
+import { BRAND_WORDMARK } from '@/config/site';
+import { formatDateTime } from '@/utils/date';
+import { sitePath } from '@/utils/sitePath';
+
+interface Props { event: EventSummary; }
+const { event } = Astro.props;
+---
+
+<article class="event-feature">
+  <div class="event-feature__media">
+    {event.imageUrl ? (
+      <ContentImage src={event.imageUrl} alt={`Locandina di ${event.title}`} variant="poster" />
+    ) : (
+      <div class="event-feature__placeholder" aria-hidden="true">{BRAND_WORDMARK}</div>
+    )}
+  </div>
+  <div class="event-feature__body">
+    <p class="eyebrow">Ci vediamo presto</p>
+    <h3>{event.title}</h3>
+    <p><time datetime={event.date}>{formatDateTime(event.date)}</time></p>
+    {event.place && <p>{event.place}</p>}
+    <a class="button" href={sitePath(`/eventi/${event.slug}/`)}>Scopri l’evento</a>
+  </div>
+</article>

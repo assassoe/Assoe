@@ -22,15 +22,17 @@ const repository = (dataset, options = {}) => createSanityRepository(
   { projectId: 'test123', dataset: 'production' }, { client: client(dataset), ...options },
 );
 
-test('il menu mantiene attiva la sola voce Iniziative nei due ambiti, anche con la base GitHub Pages', () => {
+test('il menu mantiene attiva la voce del proprio ambito, anche con la base GitHub Pages', () => {
   for (const base of ['/', '/Assoe/']) {
     for (const { path } of initiativeSections) {
       const prefix = base === '/' ? '' : '/Assoe';
-      assert.equal(initiativeNavigationPath(`${prefix}${path}`, base), `${prefix}/iniziative/`);
-      assert.equal(initiativeNavigationPath(`${prefix}${path}pagina/2/`, base), `${prefix}/iniziative/`);
+      assert.equal(initiativeNavigationPath(`${prefix}${path}`, base), `${prefix}${path}`);
+      assert.equal(initiativeNavigationPath(`${prefix}${path}pagina/2/`, base), `${prefix}${path}`);
+      const activePath = initiativeNavigationPath(`${prefix}${path}pagina/2/`, base);
+      assert.equal(initiativeSections.filter((section) => activePath.startsWith(`${prefix}${section.path}`)).length, 1);
     }
   }
-  assert.equal(initiativeNavigationPath('/volontariato/'), '/iniziative/');
+  assert.equal(initiativeNavigationPath('/volontariato/'), '/volontariato/');
   for (const pathname of ['/', '/iniziative/', '/iniziative/premio/', '/articoli/', '/volontariato-extra/', '/iniziative-sociali-extra/']) {
     assert.equal(initiativeNavigationPath(pathname, '/'), pathname);
   }

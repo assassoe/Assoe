@@ -11,7 +11,11 @@ interface Props {
 const { group, home = false } = Astro.props;
 ---
 
-<section class:list={['initiative-area-section', { 'section container home-initiatives': home }]} aria-labelledby={`iniziative-${group.value}`}>
+<section class:list={['initiative-area-section', {
+  'section container home-initiatives': home,
+  'home-initiatives--social': home && group.value === 'social',
+  'home-initiatives--volunteering': home && group.value === 'volunteering',
+}]} aria-labelledby={`iniziative-${group.value}`}>
   <div class="section__header">
     <div>
       <BrandEyebrow />
