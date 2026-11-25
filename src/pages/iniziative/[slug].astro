@@ -7,6 +7,7 @@ import EventCard from '@/components/EventCard.astro';
 import DetailLead from '@/components/DetailLead.astro';
 import RichTextContent from '@/components/RichTextContent.astro';
 import RelatedContentSection from '@/components/RelatedContentSection.astro';
+import InitiativeSpecialSections from '@/components/InitiativeSpecialSections.astro';
 import { contentRepository } from '@/content';
 import { formatDateTime } from '@/utils/date';
 import { staticPathsFromSlugs } from '@/utils/content';
@@ -38,6 +39,7 @@ const section = initiativeSections.find(({ value }) => value === initiative.area
     <DetailLead imageUrl={initiative.imageUrl} imageAlt={`Immagine dell’iniziativa ${initiative.name}`} hasText={Boolean(initiative.descriptionHtml)}>
       <RichTextContent html={initiative.descriptionHtml} />
     </DetailLead>
+    <InitiativeSpecialSections sections={initiative.specialSections} />
 
     {
       initiative.relatedArticles.length > 0 && (

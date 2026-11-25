@@ -5,6 +5,7 @@ import { cachePromise } from '../../utils/cachePromise.ts';
 import { assertUniqueSlugs } from '../../utils/content.ts';
 import { sanityAssetUrlOrUndefined } from '../../../shared/url.ts';
 import { resolveHomeSectionOrder } from '../../../shared/homeSections.ts';
+import { toInitiativeSpecialSections } from './initiativeSpecialSections.ts';
 import {
   articleByIdQuery,
   articlesByInitiativeQuery,
@@ -135,6 +136,7 @@ export function createSanityRepository(
       return {
         ...toInitiativeSummary(initiative),
         descriptionHtml: renderRichText(initiative.description),
+        specialSections: toInitiativeSpecialSections(initiative.specialSections),
         relatedArticles: (Array.isArray(articles) ? articles : []).filter(isSanityArticle).map(toArticleSummary),
         relatedEvents: (Array.isArray(events) ? events : []).filter(isSanityEvent).map(toEventSummary),
       };

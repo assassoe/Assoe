@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import { getRemoteImageSize } from '@/utils/remoteImageSize';
 
-type Variant = 'card' | 'detail' | 'poster' | 'portrait' | 'galleryThumb' | 'gallery' | 'logo' | 'logoLarge';
+type Variant = 'card' | 'detail' | 'poster' | 'portrait' | 'galleryThumb' | 'gallery' | 'logo' | 'logoLarge' | 'institutionalLogo';
 
 interface Props {
   src: string;
@@ -22,6 +22,7 @@ const dimensions: Record<Variant, { width: number; height: number; fit: 'cover' 
   gallery: { width: 1200, height: 900, fit: 'contain' },
   logo: { width: 300, height: 160, fit: 'contain' },
   logoLarge: { width: 640, height: 480, fit: 'contain' },
+  institutionalLogo: { width: 1200, height: 400, fit: 'contain' },
 };
 
 const { width, height, fit } = dimensions[variant];

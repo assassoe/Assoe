@@ -13,9 +13,18 @@ export interface InitiativeSummary {
 export interface InitiativeDetail extends InitiativeSummary {
   /** HTML prodotto dal provider, senza formati specifici del CMS. */
   descriptionHtml?: string;
+  specialSections: InitiativeSpecialSection[];
   relatedArticles: ArticleSummary[];
   relatedEvents: EventSummary[];
 }
+
+/** Sezioni pubbliche facoltative; non contengono regole normative specifiche. */
+export type InitiativeSpecialSection = { id: string; title: string } & (
+  | { kind: 'text' | 'institutional'; bodyHtml: string; period?: string }
+  | { kind: 'logos'; logos: Array<{ imageUrl: string; alt: string; url?: string }> }
+  | { kind: 'documents'; documents: Array<{ title: string; url: string; description?: string }> }
+  | { kind: 'facts'; facts: Array<{ label: string; value: string; unit?: string }> }
+);
 
 export interface ArticleSummary {
   id: string;

@@ -17,6 +17,8 @@ export interface SanityInitiative {
 
 export interface SanityInitiativeDetail extends SanityInitiative {
   description: Array<{ _type: string; _key?: string }> | null;
+  /** Le sezioni facoltative sono validate singolarmente dal relativo mapper. */
+  specialSections?: unknown;
 }
 
 export interface SanityRelatedInitiative extends SanityInitiative {

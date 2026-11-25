@@ -53,7 +53,13 @@ export const initiativeBySlugQuery = `*[
   slug.current == $slug
 ][0] {
   ${initiativeFields},
-  description
+  description,
+  specialSections[] {
+    _type, title, body, period,
+    logos[] { alt, url, "imageUrl": image.asset->url },
+    documents[] { title, description, "url": file.asset->url },
+    facts[] { label, value, unit }
+  }
 }`;
 
 export const articlesByInitiativeQuery = `*[

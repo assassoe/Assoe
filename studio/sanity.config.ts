@@ -6,6 +6,7 @@ import { PERSON_ROLE_GROUPS } from '../shared/personRoles';
 import { markdownSchema } from 'sanity-plugin-markdown';
 import { createInitiativesStructure, initiativeTemplates } from './structure/initiatives';
 import { createEventsStructure, eventInitiativeTemplate } from './structure/events';
+import { InitiativeSpecialSectionsAction } from './schemaTypes/InitiativeSpecialSectionsEditor';
 
 export default defineConfig({
   name: 'assoe-volontariato',
@@ -60,6 +61,9 @@ export default defineConfig({
   ],
   document: {
     singletons: ['siteSettings', 'homeSettings'],
+    actions: (previous, context) => context.schemaType === 'initiative'
+      ? [...previous, InitiativeSpecialSectionsAction]
+      : previous,
   },
   schema: {
     types: schemaTypes,

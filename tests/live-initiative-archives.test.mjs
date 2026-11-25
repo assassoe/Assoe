@@ -23,7 +23,11 @@ test('lo stesso server recepisce rimozioni, nuovi percorsi e spostamenti senza m
   const project = fileURLToPath(new URL('../', import.meta.url));
   const temporary = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'assoe-live-archives-')));
   const root = path.join(temporary, 'site'), data = path.join(temporary, 'cms.json');
-  t.after(() => fs.rmSync(temporary, { recursive: true, force: true }));
+  let server;
+  t.after(async () => {
+    if (server) await server.stop();
+    fs.rmSync(temporary, { recursive: true, force: true });
+  });
   fs.mkdirSync(root);
   fs.cpSync(path.join(project, 'src'), path.join(root, 'src'), { recursive: true, filter: source => source !== path.join(project, 'src/pages') });
   fs.cpSync(path.join(project, 'shared'), path.join(root, 'shared'), { recursive: true });
@@ -47,8 +51,7 @@ export const contentRepository = {
   let records = [...Array.from({ length: 7 }, (_, i) => record('original-' + i)), record('social-only', 'social')];
   const save = () => fs.writeFileSync(data, JSON.stringify(records));
   save();
-  const server = await dev({ root, configFile: false, base: '/Assoe/', logLevel: 'silent', server: { host: '127.0.0.1', port: 0 }, integrations: [liveInitiativeArchives()], vite: { resolve: { alias: { '@': path.join(root, 'src') } } } });
-  t.after(() => server.stop());
+  server = await dev({ root, configFile: false, base: '/Assoe/', logLevel: 'silent', server: { host: '127.0.0.1', port: 0 }, integrations: [liveInitiativeArchives()], vite: { resolve: { alias: { '@': path.join(root, 'src') } } } });
   const read = async (pathname) => {
     const response = await fetch(`http://127.0.0.1:${server.address.port}/Assoe${pathname}`, { redirect: 'manual', signal: AbortSignal.timeout(15000) });
     return { status: response.status, location: response.headers.get('location'), html: await response.text() };

@@ -324,6 +324,20 @@ p { line-height: 1.65; }
 .facebook-discussion p:not(.eyebrow) { margin: .45rem 0 .75rem; color: var(--muted); }
 .detail__related { margin-top: 3rem; }
 .detail__related-intro { margin-bottom: 1.5rem; }
+.initiative-special-section { margin-top: 3rem; }
+.initiative-special-section--institutional { padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-muted); }
+.initiative-special-section__period { color: var(--muted); }
+.initiative-logos { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2rem; margin: 1.5rem 0 0; padding: clamp(1.25rem, 3vw, 2rem); list-style: none; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.initiative-logos li { min-width: 0; max-width: 100%; }
+.initiative-logos .content-image--institutionalLogo { width: auto; max-width: 100%; max-height: 10rem; object-fit: contain; }
+.initiative-documents { padding: 0; list-style: none; }
+.initiative-documents li + li { margin-top: 1.25rem; }
+.initiative-documents p { margin: .35rem 0 0; color: var(--muted); }
+.initiative-documents__format { font-size: .85em; }
+.initiative-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 1rem; }
+.initiative-facts > div { padding: 1.25rem; border: 1px solid var(--line); border-radius: var(--radius); }
+.initiative-facts dt { color: var(--muted); }
+.initiative-facts dd { margin: .5rem 0 0; color: var(--green-dark); font-size: 1.5rem; font-weight: 700; overflow-wrap: anywhere; }
 .detail-gallery { margin-top: 3.5rem; padding: clamp(1.5rem, 3vw, 2.5rem); border-radius: 1.5rem; background: var(--surface-muted); }
 .detail-gallery__heading { margin-bottom: 1.4rem; }
 .detail-gallery__heading h2 { margin-bottom: 0; }

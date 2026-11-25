@@ -101,6 +101,8 @@ Il sito legge questi documenti:
 
 Le iniziative usano il tipo **`initiative`**; articoli ed eventi le collegano tramite il campo **`initiatives`**.
 
+Le iniziative supportano **contenuti istituzionali facoltativi**, accessibili dal menu secondario della scheda con **Configurazione istituzionale · Danilo**. Il modulo ordinario non mostra l’editor; se esistono sezioni configurate, mostra soltanto una nota. L’avviso «MI RACCOMANDO: NON USARE QUESTA SEZIONE» affida l’utilizzo a Danilo per i casi documentati: è una regola organizzativa, senza restrizioni aggiuntive sugli account. Nell’editor si aggiungono e riordinano testi, comunicazioni con periodo di riferimento, loghi ufficiali, PDF e dati in evidenza senza indicatori predefiniti. Per marchi con composizione prescritta si carica il blocco ufficiale completo. Aprire o chiudere l’editor non modifica i contenuti; le modifiche seguono le normali bozze e la pubblicazione Sanity. Chiudere non annulla le modifiche. Le sezioni compaiono nel dettaglio dell’iniziativa nell’ordine scelto, prima dei racconti e degli eventi collegati. Il periodo è descrittivo e non provoca scadenze o rimozioni automatiche. La funzione richiede il deploy dello Studio e una nuova build del sito; non compila automaticamente dichiarazioni né attesta conformità normativa.
+
 Gli articoli derivati dalla riclassificazione di un evento possono conservare il suo vecchio slug nel campo tecnico `legacyEventSlug`. La build genera un rimando dal precedente indirizzo evento all’articolo; se l’evento viene ripristinato, la sua pagina torna ad avere precedenza.
 
 Gli URL pubblici sono:

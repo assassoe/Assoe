@@ -1,0 +1,41 @@
+---
+import ContentImage from './ContentImage.astro';
+import RichTextContent from './RichTextContent.astro';
+import type { InitiativeSpecialSection } from '@/content/types';
+
+interface Props {
+  sections?: InitiativeSpecialSection[];
+}
+const { sections = [] } = Astro.props;
+---
+
+{sections.map((section) => (
+  <section
+    class:list={['initiative-special-section', section.kind === 'institutional' && 'initiative-special-section--institutional']}
+    aria-labelledby={section.id}
+  >
+    <h2 id={section.id}>{section.title}</h2>
+    {(section.kind === 'text' || section.kind === 'institutional') && <>
+      {section.period && <p class="initiative-special-section__period">{section.period}</p>}
+      <RichTextContent html={section.bodyHtml} />
+    </>}
+    {section.kind === 'logos' && <ul class="initiative-logos" role="list">
+      {section.logos.map((logo) => <li>
+        {logo.url ? <a href={logo.url}><ContentImage src={logo.imageUrl} alt={logo.alt} variant="institutionalLogo" /></a>
+          : <ContentImage src={logo.imageUrl} alt={logo.alt} variant="institutionalLogo" />}
+      </li>)}
+    </ul>}
+    {section.kind === 'documents' && <ul class="initiative-documents" role="list">
+      {section.documents.map((document) => <li>
+        <a class="text-link" href={document.url}>{document.title} <span class="initiative-documents__format">(PDF)</span></a>
+        {document.description && <p>{document.description}</p>}
+      </li>)}
+    </ul>}
+    {section.kind === 'facts' && <dl class="initiative-facts">
+      {section.facts.map((fact) => <div>
+        <dt>{fact.label}</dt>
+        <dd>{fact.value}{fact.unit && <> {fact.unit}</>}</dd>
+      </div>)}
+    </dl>}
+  </section>
+))}

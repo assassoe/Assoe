@@ -5,6 +5,8 @@ import { validateEditorialImageSize } from './editorialImage';
 import { imageDescription } from './imageDescriptions';
 import { validateUniqueSlug } from './slugValidation';
 import { INITIATIVE_AREAS, initiativeAreaError, initiativeAreaLabel } from '../../shared/initiativeAreas';
+import { SPECIAL_SECTION_TYPES } from '../../shared/initiativeSpecialSections';
+import { InitiativeSpecialSectionsField } from './InitiativeSpecialSectionsEditor';
 
 export const initiative = defineType({
   name: 'initiative',
@@ -50,6 +52,13 @@ export const initiative = defineType({
     }),
     orderRankField({ type: 'initiative' }),
     defineField({ name: 'active', title: 'Attivo', type: 'boolean', initialValue: true }),
+    defineField({
+      name: 'specialSections',
+      title: 'Sezioni istituzionali',
+      type: 'array',
+      of: SPECIAL_SECTION_TYPES.map(({ name }) => ({ type: name })),
+      components: { field: InitiativeSpecialSectionsField },
+    }),
   ],
   preview: {
     select: {
