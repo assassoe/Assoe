@@ -32,7 +32,7 @@ function htmlFiles(directory) {
 function outputCandidates(relativeUrlPath) {
   const normalized = path.posix.normalize(relativeUrlPath.replace(/^\/+/, ''));
   if (normalized === '..' || normalized.startsWith('../')) return [];
-  if (!normalized) return [path.join(outputDirectory, 'index.html')];
+  if (!normalized || normalized === '.') return [path.join(outputDirectory, 'index.html')];
   if (normalized.endsWith('/')) return [path.join(outputDirectory, normalized, 'index.html')];
   return [
     path.join(outputDirectory, normalized),
@@ -45,14 +45,18 @@ function outputFileForHref(href, currentFilePath) {
   const [hrefWithoutFragment] = href.split('#', 1);
   const [pathname] = hrefWithoutFragment.split('?', 1);
   if (!pathname) return currentFilePath;
-  if (!pathname.startsWith('/')) return undefined;
+  if (!pathname.startsWith('/')) {
+    const currentDirectory = path.relative(outputDirectory, path.dirname(currentFilePath)).split(path.sep).join('/');
+    return outputCandidates(path.posix.join(currentDirectory, pathname))
+      .find((candidate) => fs.existsSync(candidate) && fs.statSync(candidate).isFile());
+  }
 
   if (redirectBase && pathname !== redirectBase && !pathname.startsWith(`${redirectBase}/`)) {
     throw new Error(`${path.relative(process.cwd(), currentFilePath)}: link interno senza base GitHub Pages: ${href}`);
   }
 
   const relativeUrlPath = redirectBase ? pathname.slice(redirectBase.length) : pathname;
-  return outputCandidates(relativeUrlPath).find((candidate) => fs.existsSync(candidate));
+  return outputCandidates(relativeUrlPath).find((candidate) => fs.existsSync(candidate) && fs.statSync(candidate).isFile());
 }
 
 function assertFragmentExists(href, targetFilePath, currentFilePath) {
