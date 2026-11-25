@@ -11,6 +11,6 @@ const { current } = Astro.props;
 
 <nav class="initiative-area-nav" aria-label="Le nostre attività">
   {initiativeSections.map(({ value, title, path }) => (
-    <a href={sitePath(path)} aria-current={current === value ? 'page' : undefined}>{title}</a>
+    <a class:list={{ 'initiative-area-nav__primary': value === 'volunteering' }} href={sitePath(path)} aria-current={current === value ? 'page' : undefined}>{title}</a>
   ))}
 </nav>
