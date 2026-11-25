@@ -4,10 +4,31 @@ import ArticleList from '@/components/ArticleList.astro';
 import { contentRepository } from '@/content';
 import { ARCHIVE_PAGE_SIZE } from '@/config/pagination';
 import { ARTICLES_TITLE } from '@/config/site';
+import { selectFeaturedArticles } from '@/utils/featuredArticles';
 
 const articles = await contentRepository.listArticles();
+const featured = selectFeaturedArticles(articles);
 ---
 
 <ArchiveLayout title={ARTICLES_TITLE} eyebrow="Dal territorio" emptyMessage="Non ci sono ancora articoli pubblicati." basePath="/articoli/" currentPage={1} totalItems={articles.length}>
-  <ArticleList articles={articles.slice(0, ARCHIVE_PAGE_SIZE)} headingLevel={2} />
+  <Fragment slot="navigation">
+    {featured.length > 0 && (
+      <section class="articles-featured" aria-labelledby="articoli-in-evidenza">
+        <h2 id="articoli-in-evidenza">In evidenza</h2>
+        <ArticleList articles={featured} variant="featured" />
+      </section>
+    )}
+  </Fragment>
+  {featured.length > 0 ? (
+    <section aria-labelledby="tutti-gli-articoli">
+      <h2 id="tutti-gli-articoli">Tutti gli articoli</h2>
+      <ArticleList articles={articles.slice(0, ARCHIVE_PAGE_SIZE)} />
+    </section>
+  ) : (
+    <ArticleList articles={articles.slice(0, ARCHIVE_PAGE_SIZE)} headingLevel={2} />
+  )}
 </ArchiveLayout>
+
+<style>
+  .articles-featured { margin-bottom: 3.5rem; }
+</style>
