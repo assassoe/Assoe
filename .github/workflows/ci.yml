@@ -20,6 +20,8 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - name: Install Studio dependencies for editor tests
+        run: npm ci --prefix studio
       - run: npm run check
       - run: npm test
       - run: npm run test:coverage

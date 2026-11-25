@@ -130,7 +130,7 @@ Le immagini del logo sono soggette a una regola separata nello Studio. Prima di 
 
 ## Verifiche e build
 
-I comandi seguenti si eseguono dalla radice del repository, dopo aver installato le dipendenze.
+I comandi seguenti si eseguono dalla radice del repository, dopo aver installato le dipendenze. I test dell’editor usano anche React dallo Studio: prima di eseguire la suite o la copertura installare le sue dipendenze con `npm ci --prefix studio`. La CI esegue entrambe le installazioni.
 
 | Comando | Funzione |
 | --- | --- |
