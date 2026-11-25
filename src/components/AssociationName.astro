@@ -1,0 +1,13 @@
+---
+import { contentRepository } from '@/content';
+import { BRAND_WORDMARK, SITE_NAME } from '@/config/site';
+import { getPageAssociation } from '@/utils/association';
+
+interface Props { variant?: 'short' | 'full'; }
+
+const association = await getPageAssociation(Astro.locals, contentRepository);
+const name = Astro.props.variant === 'short'
+  ? association?.shortName ?? BRAND_WORDMARK
+  : association?.name ?? SITE_NAME;
+---
+{name}

@@ -2,6 +2,7 @@ import { defineField, defineType } from 'sanity';
 import { validIbanOrUndefined } from '../../shared/iban';
 import { validateEditorialImageSize } from './editorialImage';
 import { imageDescription } from './imageDescriptions';
+import { validateAssociationNamePart } from '../../shared/associationName';
 
 export const siteSettings = defineType({
   name: 'siteSettings',
@@ -10,9 +11,25 @@ export const siteSettings = defineType({
   fields: [
     defineField({
       name: 'associationName',
-      title: 'Nome associazione',
+      title: 'Nome completo precedente',
+      description: 'Campo di compatibilità per le versioni precedenti del sito.',
       type: 'string',
-      validation: (rule) => rule.required(),
+      hidden: true,
+      readOnly: true,
+    }),
+    defineField({
+      name: 'associationShortName',
+      title: 'Nome breve',
+      description: 'Prima riga del nome nell’header e richiami brevi nel sito. Per esempio: Asso è…',
+      type: 'string',
+      validation: (rule) => rule.required().custom(validateAssociationNamePart),
+    }),
+    defineField({
+      name: 'associationSubtitle',
+      title: 'Seconda parte del nome',
+      description: 'Seconda riga nell’header. Per esempio: La Strada Ci Insegna ODV. Il nome completo unisce questa parte al nome breve.',
+      type: 'string',
+      validation: (rule) => rule.required().custom(validateAssociationNamePart),
     }),
     defineField({
       name: 'shortDescription',
@@ -110,7 +127,12 @@ export const siteSettings = defineType({
   ],
   preview: {
     select: {
-      title: 'associationName',
+      shortName: 'associationShortName',
+      subtitle: 'associationSubtitle',
+      legacyName: 'associationName',
+    },
+    prepare({ shortName, subtitle, legacyName }) {
+      return { title: shortName || legacyName || 'Informazioni associazione', subtitle };
     },
   },
 });

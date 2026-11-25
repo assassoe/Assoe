@@ -6,14 +6,14 @@ import ContentImage from '@/components/ContentImage.astro';
 import JoinUsCta from '@/components/JoinUsCta.astro';
 import PersonCard from '@/components/PersonCard.astro';
 import { contentRepository } from '@/content';
-import { SITE_NAME } from '@/config/site';
+import { getPageAssociation } from '@/utils/association';
 import { getBoardMembers } from '@/utils/people';
 import { toParagraphs } from '@/utils/paragraphs';
 import { sitePath } from '@/utils/sitePath';
 import { telephoneHrefOrUndefined } from '../../shared/url';
 
 const [association, people] = await Promise.all([
-  contentRepository.getAssociationInfo(),
+  getPageAssociation(Astro.locals, contentRepository),
   contentRepository.listPeople(),
 ]);
 const boardMembers = getBoardMembers(people);
@@ -32,7 +32,7 @@ const hasContactMethods = Boolean(contacts?.email || contacts?.phone || associat
 const phoneHref = telephoneHrefOrUndefined(contacts?.phone);
 ---
 
-<BaseLayout title={`Chi siamo | ${SITE_NAME}`} association={association}>
+<BaseLayout title="Chi siamo" association={association}>
   <main id="contenuto" class="container">
     <div class="page-intro">
       <BrandEyebrow />

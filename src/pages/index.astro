@@ -7,6 +7,7 @@ import { contentRepository } from '@/content';
 import { getNextEvent } from '@/utils/events';
 import { SITE_NAME } from '@/config/site';
 import { sitePath } from '@/utils/sitePath';
+import { getPageAssociation } from '@/utils/association';
 
 const [homeSections, notices, initiatives, articles, events, association] = await Promise.all([
   contentRepository.listHomeSections(),
@@ -14,13 +15,13 @@ const [homeSections, notices, initiatives, articles, events, association] = awai
   contentRepository.listInitiatives(),
   contentRepository.listArticles(),
   contentRepository.listEvents(),
-  contentRepository.getAssociationInfo(),
+  getPageAssociation(Astro.locals, contentRepository),
 ]);
 
 const featuredEvent = getNextEvent(events);
 ---
 
-<BaseLayout title={SITE_NAME} association={association}>
+<BaseLayout association={association}>
   <main id="contenuto">
     <section class="hero">
       <div class="container hero__panel">

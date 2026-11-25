@@ -1,4 +1,4 @@
-/** Testi condivisi del sito: il logo può arrivare dal CMS, il layout resta in Astro. */
+/** Valori di riserva quando le informazioni dell’associazione non sono disponibili. */
 export const BRAND_WORDMARK = 'Asso è…';
 export const BRAND_SUBTITLE = 'La Strada ci Insegna ODV';
 export const SITE_NAME = `${BRAND_WORDMARK} ${BRAND_SUBTITLE}`;

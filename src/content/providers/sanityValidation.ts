@@ -81,7 +81,9 @@ export interface SanityHomeNotice {
 }
 
 export interface SanityAssociation {
-  associationName: string;
+  associationName?: string | null;
+  associationShortName?: string | null;
+  associationSubtitle?: string | null;
   shortDescription?: string | null;
   logoUrl?: string | null;
   aboutText?: string | null;
@@ -240,9 +242,12 @@ export function isSanityHomeNotice(value: unknown): value is SanityHomeNotice {
 }
 
 export function isSanityAssociation(value: unknown): value is SanityAssociation {
-  if (!isRecord(value) || !isNonEmptyString(value.associationName)) return false;
+  if (!isRecord(value) || (!isNonEmptyString(value.associationShortName) && !isNonEmptyString(value.associationName))) return false;
 
   const stringFields = [
+    'associationName',
+    'associationShortName',
+    'associationSubtitle',
     'shortDescription',
     'logoUrl',
     'aboutText',

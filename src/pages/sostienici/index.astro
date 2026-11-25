@@ -3,15 +3,16 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import { contentRepository } from '@/content';
 import { SITE_NAME } from '@/config/site';
 import { sitePath } from '@/utils/sitePath';
+import { getPageAssociation } from '@/utils/association';
 
-const association = await contentRepository.getAssociationInfo();
+const association = await getPageAssociation(Astro.locals, contentRepository);
 const taxCode = association?.taxCode?.trim();
 const bankDetails = association?.bankDetails;
 ---
 
 <BaseLayout
-  title={`Sostienici | ${SITE_NAME}`}
-  description="Scopri come sostenere Asso è… con il 5×1000 o una donazione tramite bonifico."
+  title="Sostienici"
+  description={`Scopri come sostenere ${association?.name ?? SITE_NAME} con il 5×1000 o una donazione tramite bonifico.`}
   association={association}
 >
   <main id="contenuto" class="container support-page">

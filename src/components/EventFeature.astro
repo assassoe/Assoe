@@ -1,7 +1,7 @@
 ---
 import ContentImage from './ContentImage.astro';
 import type { EventSummary } from '@/content/types';
-import { BRAND_WORDMARK } from '@/config/site';
+import AssociationName from './AssociationName.astro';
 import { formatDateTime } from '@/utils/date';
 import { sitePath } from '@/utils/sitePath';
 
@@ -14,7 +14,7 @@ const { event } = Astro.props;
     {event.imageUrl ? (
       <ContentImage src={event.imageUrl} alt={`Locandina di ${event.title}`} variant="poster" />
     ) : (
-      <div class="event-feature__placeholder" aria-hidden="true">{BRAND_WORDMARK}</div>
+      <div class="event-feature__placeholder" aria-hidden="true"><AssociationName variant="short" /></div>
     )}
   </div>
   <div class="event-feature__body">

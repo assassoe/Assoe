@@ -4,21 +4,22 @@ import JoinUsCta from '@/components/JoinUsCta.astro';
 import PersonCard from '@/components/PersonCard.astro';
 import { contentRepository } from '@/content';
 import { groupPeopleByRole } from '@/utils/people';
-import { SITE_NAME } from '@/config/site';
+import { getPageAssociation } from '@/utils/association';
+import AssociationName from '@/components/AssociationName.astro';
 
 const [association, people] = await Promise.all([
-  contentRepository.getAssociationInfo(),
+  getPageAssociation(Astro.locals, contentRepository),
   contentRepository.listPeople(),
 ]);
 
 const groups = groupPeopleByRole(people);
 ---
 
-<BaseLayout title={`Associati | ${SITE_NAME}`} association={association}>
+<BaseLayout title="Associati" association={association}>
   <main id="contenuto" class="container people-page">
     <div class="page-intro">
       <p class="eyebrow">Associazione di volontariato</p>
-      <h1>Le persone di Asso è…</h1>
+      <h1>Le persone di <AssociationName /></h1>
       <p>Qui puoi conoscere le persone che fanno parte della nostra associazione.</p>
     </div>
 

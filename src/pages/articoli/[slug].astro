@@ -12,7 +12,6 @@ import { contentRepository } from '@/content';
 import { formatDate } from '@/utils/date';
 import { requireBySlug } from '@/utils/content';
 import { articleStaticPaths } from '@/utils/articleRedirects';
-import { SITE_NAME } from '@/config/site';
 import { sitePath } from '@/utils/sitePath';
 
 export const getStaticPaths = (async () => {
@@ -29,7 +28,7 @@ const slug = Astro.params.slug;
 const article = await requireBySlug(slug, contentRepository.getArticleBySlug, 'Articolo');
 ---
 
-<BaseLayout title={`${article.title} | ${SITE_NAME}`}>
+<BaseLayout title={article.title}>
   <main id="contenuto" class="container detail">
     <a class="text-link" href={sitePath('/articoli/')}>← Tutti gli articoli</a>
     <article>

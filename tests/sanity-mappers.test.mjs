@@ -167,6 +167,8 @@ test('normalizza galleria, rich text e impostazioni associative incomplete', () 
     socialLinks: [{ platform: 'Facebook', url: 'javascript:alert(1)' }, null],
   }), {
     name: 'Asso è…',
+    shortName: 'Asso è…',
+    subtitle: undefined,
     shortDescription: undefined,
     logoUrl: undefined,
     aboutText: undefined,
@@ -213,6 +215,8 @@ test('normalizza galleria, rich text e impostazioni associative incomplete', () 
     cookiePolicyUrl: 'https://cdn.sanity.io/cookie.pdf',
   }), {
     name: 'Asso è…',
+    shortName: 'Asso è…',
+    subtitle: undefined,
     shortDescription: undefined,
     logoUrl: 'https://cdn.sanity.io/logo.png',
     aboutText: 'Descrizione',

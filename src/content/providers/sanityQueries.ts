@@ -162,8 +162,10 @@ export const homeNoticesQuery = `*[_type == "homeSettings"][0].notices[] {
   expiresOn
 }`;
 
-export const associationQuery = `*[_type == "siteSettings" && defined(associationName)][0] {
+export const associationQuery = `*[_type == "siteSettings" && (defined(associationShortName) || defined(associationName))][0] {
   associationName,
+  associationShortName,
+  associationSubtitle,
   shortDescription,
   "logoUrl": logo.asset->url,
   aboutText,

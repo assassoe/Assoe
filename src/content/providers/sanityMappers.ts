@@ -10,6 +10,7 @@ import {
   sanityAssetUrlOrUndefined,
 } from '../../../shared/url.ts';
 import { validIbanOrUndefined } from '../../../shared/iban.ts';
+import { associationNamePart } from '../../../shared/associationName.ts';
 import { initiativeImageUrl } from './sanityImage.ts';
 import { isHomeNoticeExpired, MAX_HOME_NOTICES, MAX_HOME_NOTICE_LINK_LABEL_LENGTH, todayInRome } from '../../../shared/homeNotices.ts';
 import {
@@ -117,9 +118,15 @@ export function safeSanityAssetUrls(urls: Array<string | null> | null): string[]
 export function toAssociationInfo(info: SanityAssociation): AssociationInfo {
   const iban = validIbanOrUndefined(info.bankDetails?.iban);
   const accountHolder = info.bankDetails?.accountHolder?.trim();
+  const configuredShortName = associationNamePart(info.associationShortName);
+  const shortName = configuredShortName || associationNamePart(info.associationName) || '';
+  // Un documento precedente conserva il nome intero finché non si configura il nome breve.
+  const subtitle = configuredShortName ? associationNamePart(info.associationSubtitle) : undefined;
 
   return {
-    name: info.associationName.trim(),
+    name: [shortName, subtitle].filter(Boolean).join(' '),
+    shortName,
+    subtitle,
     shortDescription: info.shortDescription?.trim() || undefined,
     logoUrl: sanityAssetUrlOrUndefined(info.logoUrl),
     aboutText: info.aboutText?.trim() || undefined,

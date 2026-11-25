@@ -9,23 +9,27 @@ import { siteNavigation } from '@/config/navigation';
 import { SITE_NAME } from '@/config/site';
 import { sitePath } from '@/utils/sitePath';
 import { initiativeNavigationPath } from '@/utils/initiatives';
+import { getPageAssociation } from '@/utils/association';
 
 interface Props {
-  title: string;
+  /** Titolo della pagina; il layout aggiunge il nome completo dell’associazione. */
+  title?: string;
   description?: string;
   association?: AssociationInfo | null;
   navigationPath?: string;
 }
 
 const {
-  title,
-  description = SITE_NAME,
+  title: pageTitle,
   association: providedAssociation,
 } = Astro.props;
 
 const association = providedAssociation === undefined
-  ? await contentRepository.getAssociationInfo()
+  ? await getPageAssociation(Astro.locals, contentRepository)
   : providedAssociation;
+const name = association?.name ?? SITE_NAME;
+const title = pageTitle ? `${pageTitle} | ${name}` : name;
+const description = Astro.props.description ?? name;
 let favicon = null;
 const svgLogo = association?.logoUrl?.split(/[?#]/, 1)[0].toLowerCase().endsWith('.svg');
 if (association?.logoUrl) {
@@ -55,7 +59,7 @@ const isCurrent = (href: string) => href === homePath ? currentPath === homePath
     <a class="skip-link" href="#contenuto">Vai al contenuto</a>
     <header class="site-header">
       <div class="container site-header__inner">
-        <SiteBrand logoUrl={association?.logoUrl} name={association?.name} />
+        <SiteBrand association={association} />
         <nav class="desktop-nav" aria-label="Navigazione principale">
           {siteNavigation.map((item) => <a href={item.href} class:list={{ 'nav-cta': item.featured }} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>)}
         </nav>

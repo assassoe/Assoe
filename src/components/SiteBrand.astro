@@ -2,22 +2,22 @@
 import ContentImage from './ContentImage.astro';
 import { BRAND_SUBTITLE, BRAND_WORDMARK, SITE_NAME } from '@/config/site';
 import { sitePath } from '@/utils/sitePath';
+import type { AssociationInfo } from '@/content/types';
 
 interface Props {
-  logoUrl?: string;
-  name?: string;
+  association: AssociationInfo | null;
 }
 
-const {
-  logoUrl,
-  name = SITE_NAME,
-} = Astro.props;
+const { association } = Astro.props;
+const name = association?.name ?? SITE_NAME;
+const shortName = association?.shortName ?? BRAND_WORDMARK;
+const subtitle = association ? association.subtitle : BRAND_SUBTITLE;
 ---
 
 <a class="brand brand--header" href={sitePath('/')} aria-label={`${name}, pagina iniziale`}>
-  {logoUrl && <ContentImage src={logoUrl} alt="" variant="logo" eager />}
+  {association?.logoUrl && <ContentImage src={association.logoUrl} alt="" variant="logo" eager />}
   <span class="brand__wordmark">
-    <strong class="brand__main">{BRAND_WORDMARK}</strong>
-    <span class="brand__sub">{BRAND_SUBTITLE}</span>
+    <strong class="brand__main">{shortName}</strong>
+    {subtitle && <span class="brand__sub">{subtitle}</span>}
   </span>
 </a>

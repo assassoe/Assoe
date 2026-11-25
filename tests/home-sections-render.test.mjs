@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { build } from 'astro';
 import { JSDOM } from 'jsdom';
 import { resolveHomeSectionOrder } from '../shared/homeSections.ts';
+import { toAssociationInfo } from '../src/content/providers/sanityMappers.ts';
 
 test('la homepage genera le sezioni nell’ordine editoriale conservando contenuti e visibilità', async (t) => {
   const project = fileURLToPath(new URL('../', import.meta.url));
@@ -62,7 +63,7 @@ const association = ${JSON.stringify(association)};
 ---
 <html lang="it"><head><title>Adesione</title></head><body><JoinUsCta association={association} href="#contatti" /></body></html>`);
   }
-  const association = { name: 'Associazione', aboutText: 'Il nostro impegno.', contacts: {}, socialLinks: [], documents: {} };
+  const association = toAssociationInfo({ associationName: 'Vecchio nome', associationShortName: 'Nome dal CMS', associationSubtitle: 'Seconda parte ODV', aboutText: 'Il nostro impegno.', taxCode: '01234567890' });
   fs.writeFileSync(path.join(fixture, 'src/content/index.ts'), `export const contentRepository = {
     getAssociationInfo: async () => (${JSON.stringify(association)}), listPeople: async () => [],
     listHomeSections: async () => ${JSON.stringify(defaults)}, listHomeNotices: async () => [],
@@ -70,6 +71,27 @@ const association = ${JSON.stringify(association)};
   };`);
   fs.copyFileSync(path.join(project, 'src/pages/chi-siamo.astro'), path.join(fixture, 'src/pages/chi-siamo.astro'));
   fs.copyFileSync(path.join(project, 'src/pages/index.astro'), path.join(fixture, 'src/pages/index.astro'));
+  for (const name of ['associati', 'sostienici']) {
+    fs.mkdirSync(path.join(fixture, 'src/pages', name), { recursive: true });
+    fs.copyFileSync(path.join(project, 'src/pages', name, 'index.astro'), path.join(fixture, 'src/pages', name, 'index.astro'));
+  }
+  const identities = {
+    'brand-first': toAssociationInfo({ associationShortName: 'Prima parte nuova', associationSubtitle: 'Seconda parte ODV' }),
+    'brand-second': toAssociationInfo({ associationShortName: 'Nome dal CMS', associationSubtitle: 'Seconda parte nuova ODV' }),
+    'brand-legacy': toAssociationInfo({ associationName: 'Nome precedente intero' }),
+    'brand-missing': null,
+    'brand-escaped': toAssociationInfo({ associationShortName: '<script>nome</script>', associationSubtitle: 'Nome & ODV' }),
+  };
+  for (const [name, identity] of Object.entries(identities)) {
+    fs.writeFileSync(path.join(fixture, 'src/pages', `${name}.astro`), `---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BrandEyebrow from '../components/BrandEyebrow.astro';
+import HomeSupport from '../components/HomeSupport.astro';
+import EventFeature from '../components/EventFeature.astro';
+Astro.locals.associationInfo = Promise.resolve(${JSON.stringify(identity)});
+---
+<BaseLayout title="Pagina prova"><main id="contenuto"><BrandEyebrow /><HomeSupport /><EventFeature event={${JSON.stringify(content.featuredEvent)}} /></main></BaseLayout>`);
+  }
   fs.mkdirSync(path.join(fixture, 'src/pages/iniziative'), { recursive: true });
   fs.copyFileSync(path.join(project, 'src/pages/iniziative/index.astro'), path.join(fixture, 'src/pages/iniziative/index.astro'));
   await build({
@@ -97,6 +119,34 @@ const association = ${JSON.stringify(association)};
     assert.equal(area.querySelector('a[href="/Assoe/iniziative/"]'), null);
   }
   assert.equal(document('iniziative').querySelector('meta[http-equiv="refresh"]').content, '0;url=/Assoe/');
+  const fullName = 'Nome dal CMS Seconda parte ODV';
+  const home = document('index');
+  assert.equal(home.querySelector('.brand__main').textContent, association.shortName);
+  assert.equal(home.querySelector('.brand__sub').textContent, association.subtitle);
+  assert.equal(home.querySelector('.brand').getAttribute('aria-label'), `${fullName}, pagina iniziale`);
+  assert.equal(home.querySelector('h1').textContent, fullName);
+  assert.equal(home.title, fullName);
+  assert.equal(home.querySelector('meta[name="description"]').content, fullName);
+  assert.equal(home.querySelector('.site-footer__identity > strong').textContent, fullName);
+  assert.match(home.querySelector('.five-per-mille').textContent, /Nome dal CMS Seconda parte ODV/);
+  assert.equal(document('chi-siamo').title, `Chi siamo | ${fullName}`);
+  assert.equal(document('chi-siamo').querySelector('.brand-eyebrow').textContent, association.shortName);
+  assert.equal(document('associati').querySelector('h1').textContent, `Le persone di ${fullName}`);
+  assert.equal(document('sostienici').querySelector('.support-method__name').textContent, fullName);
+  assert.match(document('sostienici').querySelector('meta[name="description"]').content, /Nome dal CMS Seconda parte ODV/);
+  for (const [name, identity] of Object.entries(identities)) {
+    const page = document(name);
+    const complete = identity?.name ?? 'Asso è… La Strada ci Insegna ODV';
+    const short = identity?.shortName ?? 'Asso è…';
+    assert.equal(page.title, `Pagina prova | ${complete}`);
+    assert.equal(page.querySelector('.brand__main').textContent, short);
+    assert.equal(page.querySelector('.brand__sub')?.textContent, identity ? identity.subtitle : 'La Strada ci Insegna ODV');
+    assert.equal(page.querySelector('.brand-eyebrow').textContent, short);
+    assert.equal(page.querySelector('.event-feature__placeholder').textContent, short);
+    assert.equal(page.querySelector('.site-footer__identity > strong').textContent, complete);
+    assert.ok(page.querySelector('.five-per-mille').textContent.includes(complete));
+    assert.equal(page.querySelector('header script'), null);
+  }
   const reordered = document('reordered');
   assert.deepEqual(sectionIds(reordered), ['hero', ...expected.toReversed()]);
   assert.deepEqual([...reordered.querySelectorAll('[aria-labelledby="iniziative-social"] h3')].map((node) => node.textContent), ['social 1', 'social 2']);

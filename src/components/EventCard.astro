@@ -1,6 +1,6 @@
 ---
 import ContentImage from './ContentImage.astro';
-import { BRAND_WORDMARK } from '@/config/site';
+import AssociationName from './AssociationName.astro';
 
 interface Props {
   href: string;
@@ -19,7 +19,7 @@ const { href, title, imageUrl, meta } = Astro.props;
         imageUrl ? (
           <ContentImage src={imageUrl} alt="" variant="poster" />
         ) : (
-          <span class="content-card__placeholder" aria-hidden="true">{BRAND_WORDMARK}</span>
+          <span class="content-card__placeholder" aria-hidden="true"><AssociationName variant="short" /></span>
         )
       }
     </div>

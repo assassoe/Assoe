@@ -79,7 +79,10 @@ export interface ContactInfo {
 }
 
 export interface AssociationInfo {
+  /** Nome completo composto dalle due parti configurate nel CMS. */
   name: string;
+  shortName: string;
+  subtitle?: string;
   shortDescription?: string;
   logoUrl?: string;
   aboutText?: string;
