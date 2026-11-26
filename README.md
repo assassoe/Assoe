@@ -139,6 +139,7 @@ I comandi seguenti si eseguono dalla radice del repository, dopo aver installato
 | `npm run check` | Controlla tipi e componenti Astro |
 | `npm test` | Esegue i test automatici |
 | `npm run test:coverage` | Verifica la copertura dei test e le soglie configurate |
+| `npm run quality:report` | Esegue i controlli di sito e Studio e salva la scheda di qualità in `quality-reports/local/` |
 | `npm run build` | Genera il sito statico in `dist/` |
 | `npm run check:build` | Verifica pagine, collegamenti e struttura dell’ultima build |
 | `npm run preview` | Serve l’ultima build su `http://localhost:4323/` |
@@ -161,6 +162,14 @@ I test dell’ordine della homepage verificano validazione, compatibilità con i
 `npm run test:coverage` misura con V8 righe, rami e funzioni eseguiti, con soglie complessive del **95%**, **90%** e **100%**. Il [perimetro](scripts/coverage-scope.mjs) comprende utilità, script, provider, moduli condivisi, struttura degli elenchi dello Studio e i suoi moduli di validazione e upload; esclude componenti Astro, CSS e interfaccia React. Il [controllo](scripts/test-coverage.mjs) fallisce anche se un modulo previsto non compare nel report. Le percentuali descrivono l’esecuzione del codice incluso, non la copertura di tutti i requisiti.
 
 `npm run audit:high` nello Studio richiede un report npm valido e fallisce anche per errori di rete o di esecuzione. L’override mirato di `undici` nel plugin dei tipi impone la versione corretta della serie 7; le eventuali eccezioni alle advisory restano definite nello script di audit.
+
+### Scheda di qualità
+
+`npm run quality:report` raccoglie test, copertura, controllo Astro, build, verifica HTML e audit, senza interrompere i controlli indipendenti dopo un errore. Richiede entrambe le installazioni delle dipendenze e la configurazione Sanity della build. Aprire `quality-reports/local/report.html`; la stessa cartella contiene report Markdown, dati JSON e log. Un controllo HTML non viene eseguito se la build di quella esecuzione fallisce. Gli output sono esclusi da Git. `npm run test:coverage` conserva inoltre `coverage/lcov.info`.
+
+Il workflow Quality checks genera una sintesi GitHub e un artefatto `quality-report-<commit>` scaricabile, conservato per 90 giorni nei limiti delle impostazioni del repository. I report identificano commit, eventuale merge di prova delle pull request, modifiche locali, impronta dei sorgenti, strumenti e perimetro. Le build leggono i contenuti Sanity correnti: il commit non congela il CMS. L’esito resta incompleto se manca SonarQube; i fallimenti dei controlli obbligatori mantengono la CI in errore. Il report non è una certificazione e non modifica le regole di integrazione o il workflow Pages.
+
+La scansione facoltativa **SonarQube Cloud** richiede un progetto, le variabili Actions `SONAR_PROJECT_KEY` e `SONAR_ORGANIZATION` e il secret `SONAR_TOKEN`. Nell’impostazione del progetto scegliere l’analisi con GitHub Actions e disattivare quella automatica per importare la copertura LCOV. Il workflow esegue la scansione sul ramo principale e sulle pull request dirette a quel ramo; `SONAR_ALL_BRANCHES=true` abilita gli altri rami solo dopo aver verificato che il piano lo consenta. SonarQube è inizialmente informativo: registra il Quality Gate della specifica analisi senza aggiungere un blocco delle integrazioni. I file `.astro` sono esclusi dalla scansione e restano verificati dai controlli dedicati; la copertura SonarQube usa un perimetro più ampio di quella V8 e può differire. La configurazione nel repository non prova che il servizio esterno sia attivo.
 
 ## Pubblicazione
 

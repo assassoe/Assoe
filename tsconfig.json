@@ -19,5 +19,5 @@
     }
   },
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["studio", "crawl-rendered", "dist", "node_modules"]
+  "exclude": ["studio", "crawl-rendered", "archivio-iniziative", "quality-reports", "coverage", "dist", "node_modules"]
 }

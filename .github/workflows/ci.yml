@@ -15,6 +15,8 @@ jobs:
       PUBLIC_SANITY_DATASET: ${{ vars.PUBLIC_SANITY_DATASET || 'production' }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v7
         with:
           node-version: 24
@@ -22,18 +24,59 @@ jobs:
       - run: npm ci
       - name: Install Studio dependencies for editor tests
         run: npm ci --prefix studio
-      - run: npm run check
-      - run: npm test
-      - run: npm run test:coverage
-      - run: npm run build
-      - run: npm run check:build
-      - run: npm audit --omit=dev --audit-level=high
+      - name: Check frontend and collect evidence
+        id: report
+        run: npm run quality:report -- --group frontend
+        env:
+          QUALITY_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      - name: Check SonarQube configuration
+        id: sonar-config
+        if: ${{ !cancelled() }}
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
+          SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
+          BRANCH_SUPPORTED: ${{ vars.SONAR_ALL_BRANCHES == 'true' || github.ref_name == github.event.repository.default_branch || github.base_ref == github.event.repository.default_branch }}
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const configured = ['SONAR_TOKEN', 'SONAR_PROJECT_KEY', 'SONAR_ORGANIZATION'].every(key => Boolean(process.env[key]));
+          const enabled = configured && process.env.BRANCH_SUPPORTED === 'true';
+          const reason = !configured ? 'Progetto SonarQube Cloud o autenticazione non configurati.' : !enabled ? 'Ramo escluso dalla configurazione SonarQube: verificare il piano prima di abilitare tutti i rami.' : 'Scansione configurata; se assente, verificare i passaggi precedenti e il report LCOV.';
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `enabled=${enabled}\nreason=${reason}\n`);
+          NODE
+      - name: SonarQube scan (advisory)
+        id: sonar
+        if: ${{ !cancelled() && steps.sonar-config.outputs.enabled == 'true' && hashFiles('quality-reports/frontend/lcov.info') != '' }}
+        continue-on-error: true
+        uses: SonarSource/sonarqube-scan-action@v8
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >-
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+            -Dsonar.qualitygate.wait=true
+            -Dsonar.qualitygate.timeout=300
+      - name: Save result of this SonarQube analysis
+        if: ${{ !cancelled() }}
+        run: node scripts/sonar-report.mjs
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
+          SONAR_SCAN_OUTCOME: ${{ steps.sonar.outcome }}
+          SONAR_SCAN_REASON: ${{ steps.sonar-config.outputs.reason }}
+      - name: Upload frontend evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: quality-frontend-${{ github.sha }}
+          path: quality-reports/frontend/
+          if-no-files-found: error
+          retention-days: 90
 
   studio:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: studio
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -41,6 +84,49 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: studio/package-lock.json
-      - run: npm ci
-      - run: npm run build
-      - run: npm run audit:high
+      - run: npm ci --prefix studio
+      - name: Check Studio and collect evidence
+        run: node scripts/quality-report.mjs --group studio
+        env:
+          QUALITY_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      - name: Upload Studio evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: quality-studio-${{ github.sha }}
+          path: quality-reports/studio/
+          if-no-files-found: error
+          retention-days: 90
+
+  report:
+    name: Quality report
+    if: ${{ always() }}
+    needs: [frontend, studio]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Download frontend evidence
+        uses: actions/download-artifact@v8
+        with:
+          name: quality-frontend-${{ github.sha }}
+          path: quality-input/frontend
+      - name: Download Studio evidence
+        if: ${{ !cancelled() }}
+        uses: actions/download-artifact@v8
+        with:
+          name: quality-studio-${{ github.sha }}
+          path: quality-input/studio
+      - name: Generate combined report and GitHub summary
+        if: ${{ !cancelled() }}
+        run: node scripts/quality-report.mjs --merge quality-input --output quality-reports/combined
+      - name: Upload report for this commit
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: quality-report-${{ github.sha }}
+          path: quality-reports/combined/
+          if-no-files-found: error
+          retention-days: 90

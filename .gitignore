@@ -2,6 +2,9 @@ node_modules/
 .astro/
 dist/
 .sanity/
+coverage/
+quality-reports/
+.scannerwork/
 
 # Variabili d'ambiente locali
 .env
