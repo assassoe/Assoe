@@ -144,6 +144,14 @@ for (const filePath of pages) {
   if (!/<meta name="description" content="[^"]+"/i.test(html)) {
     throw new Error(`${relativePath}: meta description mancante.`);
   }
+  if (!/<link rel="canonical" href="https:\/\/[^"]+"/i.test(html)) {
+    throw new Error(`${relativePath}: canonical HTTPS mancante.`);
+  }
+  for (const property of ['title', 'description', 'url']) {
+    if (!new RegExp(`<meta property="og:${property}" content="[^"]+"`, 'i').test(html)) {
+      throw new Error(`${relativePath}: Open Graph ${property} mancante.`);
+    }
+  }
   if (process.env.PUBLIC_SITE_PREVIEW === 'true' && !/<meta name="robots" content="noindex,nofollow"/i.test(html)) {
     throw new Error(`${relativePath}: il sito di anteprima deve restare non indicizzabile.`);
   }

@@ -28,7 +28,7 @@ const slug = Astro.params.slug;
 const article = await requireBySlug(slug, contentRepository.getArticleBySlug, 'Articolo');
 ---
 
-<BaseLayout title={article.title}>
+<BaseLayout title={article.title} description={article.summary} socialImage={article.imageUrl}>
   <main id="contenuto" class="container detail">
     <a class="text-link" href={sitePath('/articoli/')}>← Tutti gli articoli</a>
     <article>

@@ -45,10 +45,10 @@ const copyrightLabel = copyrightText.startsWith('©') ? copyrightText : `© ${co
     <div class="site-footer__bottom">
       <span>{copyrightLabel}</span>
       <nav
-        class:list={['site-footer__bottom-links', !hasDocuments && 'site-footer__bottom-links--contact-only']}
+        class="site-footer__bottom-links"
         aria-label="Contatti e documenti"
       >
-        {documents?.privacyPolicyUrl && <a href={documents.privacyPolicyUrl}>Privacy</a>}
+        <a href={sitePath('/privacy/')}>Privacy</a>
         <a class="site-footer__contact-mobile" href={sitePath('/chi-siamo/#contatti')}>Contattaci</a>
         {hasDocuments && <a href={sitePath('/chi-siamo/#documenti-associazione')}>Documenti</a>}
       </nav>
