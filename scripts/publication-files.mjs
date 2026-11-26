@@ -34,7 +34,8 @@ export function publicationFiles() {
         }
         const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n'
           + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-          + [...locations].sort().map((url) => `  <url><loc>${url}</loc></url>\n`).join('')
+          + [...locations].sort((left, right) => left.localeCompare(right, 'en'))
+            .map((url) => `  <url><loc>${url}</loc></url>\n`).join('')
           + '</urlset>\n';
         const sitemapUrl = new URL(`${base.replace(/\/$/, '')}/sitemap.xml`, site);
         // Lascia il crawler libero di leggere il noindex dell'anteprima.

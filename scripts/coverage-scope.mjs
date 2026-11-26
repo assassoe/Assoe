@@ -14,6 +14,7 @@ export const coverageIncludes = [
   'scripts/quality-report-lib.mjs',
   'scripts/quality-report.mjs',
   'scripts/sonar-report.mjs',
+  'scripts/publication-files.mjs',
 ];
 
 function sourceFiles(directory) {
