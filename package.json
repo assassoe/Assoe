@@ -10,6 +10,7 @@
     "preview": "astro preview --host 127.0.0.1 --port 4323",
     "check": "astro check",
     "check:build": "node scripts/check-static-output.mjs",
+    "clean": "node scripts/clean.mjs",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "test:coverage": "node scripts/test-coverage.mjs",
     "quality:report": "node scripts/quality-report.mjs"
