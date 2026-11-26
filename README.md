@@ -110,7 +110,7 @@ Il report locale si apre da `quality-reports/local/report.html`. La CI [Quality 
 
 Il workflow [Publish Astro to GitHub Pages](.github/workflows/pages.yml) legge `main`, genera il sito e lo pubblica su push, avvio manuale o pianificazione quotidiana. Usa le variabili Actions `PUBLIC_SANITY_PROJECT_ID` e `PUBLIC_SANITY_DATASET`, con `production` come dataset predefinito. La build quotidiana aggiorna anche la distinzione fra eventi futuri e passati.
 
-La configurazione attuale pubblica un’anteprima GitHub Pages sotto il percorso del repository, con `noindex,nofollow`. Il dominio personalizzato richiede configurazione DNS e aggiornamento di `SITE_URL`, `SITE_BASE` e `PUBLIC_SITE_PREVIEW` nel workflow. Gli indirizzi dipendono anche da [astro.config.mjs](astro.config.mjs).
+Il workflow genera il sito per `https://assoe.it`, alla radice del dominio e con indicizzazione abilitata (`SITE_URL=https://assoe.it`, `SITE_BASE=/`, `PUBLIC_SITE_PREVIEW=false`). La raggiungibilità richiede anche il dominio personalizzato nelle impostazioni GitHub Pages, i puntamenti DNS su Aruba e il certificato HTTPS. Il vecchio sito su `volontariato.assoe.it` resta su Aruba SuperSite e conserva la propria configurazione DNS. Gli indirizzi dipendono anche da [astro.config.mjs](astro.config.mjs).
 
 Per distribuire lo Studio, da una sessione autenticata a Sanity:
 
