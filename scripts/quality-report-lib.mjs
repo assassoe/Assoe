@@ -1,7 +1,21 @@
 import { coverageIncludes } from './coverage-scope.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
 
 export const coverageThresholds = { lines: 95, branches: 90, functions: 100 };
 export const coverageScope = coverageIncludes;
+
+export function reportDirectory(root, requested) {
+  root = path.resolve(root);
+  const parent = path.join(root, 'quality-reports');
+  const output = path.resolve(root, requested);
+  const relative = path.relative(parent, output);
+  if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) throw new Error('I report devono restare nella cartella quality-reports');
+  for (let directory = output; directory !== root; directory = path.dirname(directory)) {
+    if (fs.existsSync(directory) && fs.lstatSync(directory).isSymbolicLink()) throw new Error('Il percorso dei report non può contenere collegamenti simbolici');
+  }
+  return output;
+}
 
 export function parseLcov(text) {
   const fields = { LF: 0, LH: 0, BRF: 0, BRH: 0, FNF: 0, FNH: 0 };

@@ -3,18 +3,24 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { parseLcov, parseTests, reportStatus, renderMarkdown, renderHtml, coverageScope, coverageThresholds } from './quality-report-lib.mjs';
+import { parseLcov, parseTests, reportStatus, renderMarkdown, renderHtml, reportDirectory, coverageScope, coverageThresholds } from './quality-report-lib.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const args = process.argv.slice(2);
 const option = (name, fallback) => args.includes(name) ? args[args.indexOf(name) + 1] : fallback;
 const group = option('--group', 'all');
 if (!['all', 'frontend', 'studio'].includes(group)) throw new Error('Gruppo non valido');
-const output = path.resolve(root, option('--output', `quality-reports/${group === 'all' ? 'local' : group}`));
+const output = reportDirectory(root, option('--output', `quality-reports/${group === 'all' ? 'local' : group}`));
 fs.mkdirSync(output, { recursive: true });
 
+function npmCli() {
+  const filename = process.env.npm_execpath;
+  if (!filename || !path.isAbsolute(filename) || !fs.statSync(filename).isFile()) throw new Error('Avviare il report con npm run quality:report');
+  return filename;
+}
+
 function git(...gitArgs) {
-  const result = spawnSync('git', gitArgs, { cwd: root, encoding: 'utf8' });
+  const result = spawnSync('/usr/bin/git', gitArgs, { cwd: root, encoding: 'utf8' });
   if (result.status !== 0) throw new Error('Impossibile identificare i sorgenti Git');
   return result.stdout.trim();
 }
@@ -34,7 +40,7 @@ function metadata() {
   return {
     revision: git('rev-parse', 'HEAD'), branch: process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || git('branch', '--show-current'),
     dirty: Boolean(git('status', '--porcelain')), sourceDigest: hash.digest('hex'), startedAt: new Date().toISOString(),
-    node: process.version, npm: spawnSync('npm', ['--version'], { encoding: 'utf8' }).stdout.trim(),
+    node: process.version, npm: spawnSync(process.execPath, [npmCli(), '--version'], { encoding: 'utf8' }).stdout.trim(),
     versions: { astro: frontend.packages['node_modules/astro'].version, typescript: frontend.packages['node_modules/typescript'].version,
       studioTypescript: studio.packages['node_modules/typescript'].version, sanity: studio.packages['node_modules/sanity'].version },
     runUrl: process.env.GITHUB_ACTIONS ? `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}/attempts/${process.env.GITHUB_RUN_ATTEMPT}` : null,
@@ -51,7 +57,7 @@ function execute(id, label, command, parameters, dependency) {
   const descriptor = fs.openSync(path.join(output, filename), 'w');
   let result;
   try {
-    result = spawnSync(command, parameters, { cwd: root, stdio: ['ignore', descriptor, descriptor], timeout: 15 * 60 * 1000,
+    result = spawnSync(process.execPath, [npmCli(), ...parameters], { cwd: root, stdio: ['ignore', descriptor, descriptor], timeout: 15 * 60 * 1000,
       env: { ...process.env, NO_COLOR: '1', COVERAGE_REPORT_PATH: path.join(output, 'lcov.info') } });
     if (result.error || result.signal) fs.writeSync(descriptor, `\nProcesso non completato: ${result.error?.code || result.signal}\n`);
   } finally { fs.closeSync(descriptor); }

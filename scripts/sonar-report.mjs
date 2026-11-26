@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const output = process.argv[2] || 'quality-reports/frontend/sonar.json';
+if (process.argv.length > 2) throw new Error('Il percorso del report SonarQube è fisso; non sono ammessi argomenti.');
+const output = 'quality-reports/frontend/sonar.json';
 const outcome = process.env.SONAR_SCAN_OUTCOME;
 let report = { status: 'not_run', reason: process.env.SONAR_SCAN_REASON || 'Scansione SonarQube non configurata o non eseguita per questo ramo.' };
 
@@ -29,6 +30,7 @@ try {
       url: `https://sonarcloud.io/dashboard?id=${encodeURIComponent(process.env.SONAR_PROJECT_KEY)}`,
       conditions: projectStatus.conditions ?? [], ignoredConditions: projectStatus.ignoredConditions ?? false,
     };
+    if (/^\d+$/.test(process.env.SONAR_PULL_REQUEST || '')) report.url += `&pullRequest=${process.env.SONAR_PULL_REQUEST}`;
   }
 } catch {
   // Never copy API bodies or authentication material into public artifacts.

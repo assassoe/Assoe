@@ -11,6 +11,9 @@ export const coverageIncludes = [
   'studio/schemaTypes/editorialImage.ts',
   'studio/schemaTypes/galleryUpload.ts',
   'studio/schemaTypes/featuredArticles.ts',
+  'scripts/quality-report-lib.mjs',
+  'scripts/quality-report.mjs',
+  'scripts/sonar-report.mjs',
 ];
 
 function sourceFiles(directory) {

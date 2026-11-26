@@ -21,9 +21,9 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - name: Install Studio dependencies for editor tests
-        run: npm ci --prefix studio
+        run: npm ci --prefix studio --ignore-scripts
       - name: Check frontend and collect evidence
         id: report
         run: npm run quality:report -- --group frontend
@@ -49,7 +49,7 @@ jobs:
         id: sonar
         if: ${{ !cancelled() && steps.sonar-config.outputs.enabled == 'true' && hashFiles('quality-reports/frontend/lcov.info') != '' }}
         continue-on-error: true
-        uses: SonarSource/sonarqube-scan-action@v8
+        uses: SonarSource/sonarqube-scan-action@70bad232163b09d998ea0707ee80c0ec80798c16 # v8.5.1
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
@@ -64,6 +64,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
+          SONAR_PULL_REQUEST: ${{ github.event.pull_request.number }}
           SONAR_SCAN_OUTCOME: ${{ steps.sonar.outcome }}
           SONAR_SCAN_REASON: ${{ steps.sonar-config.outputs.reason }}
       - name: Upload frontend evidence
@@ -84,9 +85,9 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: studio/package-lock.json
-      - run: npm ci --prefix studio
+      - run: npm ci --prefix studio --ignore-scripts
       - name: Check Studio and collect evidence
-        run: node scripts/quality-report.mjs --group studio
+        run: npm run quality:report -- --group studio
         env:
           QUALITY_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       - name: Upload Studio evidence
