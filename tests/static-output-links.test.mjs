@@ -7,7 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const checker = fileURLToPath(new URL('../scripts/check-static-output.mjs', import.meta.url));
-const markup = (content) => `<!doctype html><html><head><title>Pagina</title><meta name="description" content="Descrizione"><meta name="robots" content="noindex,nofollow"></head><body><header class="site-header"><span class="brand__wordmark">Asso è…</span></header><nav class="desktop-nav" aria-label="Navigazione principale"></nav><nav aria-label="Navigazione mobile"></nav><main><h1>Pagina</h1>${content}</main><footer class="site-footer"></footer></body></html>`;
+const markup = (content) => `<!doctype html><html><head><title>Pagina</title><meta name="description" content="Descrizione"><meta name="robots" content="noindex,nofollow"><link rel="canonical" href="https://example.org/"><meta property="og:title" content="Pagina"><meta property="og:description" content="Descrizione"><meta property="og:url" content="https://example.org/"></head><body><header class="site-header"><span class="brand__wordmark">Asso è…</span></header><nav class="desktop-nav" aria-label="Navigazione principale"></nav><nav aria-label="Navigazione mobile"></nav><main><h1>Pagina</h1>${content}</main><footer class="site-footer"></footer></body></html>`;
 
 function check(t, href, base) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'assoe-static-links-'));

@@ -64,7 +64,11 @@ const association = ${JSON.stringify(association)};
 ---
 <html lang="it"><head><title>Adesione</title></head><body><JoinUsCta association={association} href="#contatti" /></body></html>`);
   }
-  const association = toAssociationInfo({ associationName: 'Vecchio nome', associationShortName: 'Nome dal CMS', associationSubtitle: 'Seconda parte ODV', aboutText: 'Il nostro impegno.', taxCode: '01234567890' });
+  const association = toAssociationInfo({
+    associationName: 'Vecchio nome', associationShortName: 'Nome dal CMS', associationSubtitle: 'Seconda parte ODV',
+    aboutText: 'Il nostro impegno.', taxCode: '01234567890', registryInfo: 'RUNTS n. 12345',
+    contacts: { email: 'contatti-cms@example.org', address: 'Via del CMS 42', postalCode: '00100', city: 'Roma', province: 'RM' },
+  });
   fs.writeFileSync(path.join(fixture, 'src/content/index.ts'), `export const contentRepository = {
     getAssociationInfo: async () => (${JSON.stringify(association)}), listPeople: async () => [],
     listHomeSections: async () => ${JSON.stringify(defaults)}, listHomeNotices: async () => [],
@@ -72,6 +76,10 @@ const association = ${JSON.stringify(association)};
   };`);
   fs.copyFileSync(path.join(project, 'src/pages/chi-siamo.astro'), path.join(fixture, 'src/pages/chi-siamo.astro'));
   fs.copyFileSync(path.join(project, 'src/pages/index.astro'), path.join(fixture, 'src/pages/index.astro'));
+  fs.cpSync(path.join(project, 'src/pages/privacy'), path.join(fixture, 'src/pages/privacy'), { recursive: true });
+  fs.cpSync(path.join(project, 'src/pages/.well-known'), path.join(fixture, 'src/pages/.well-known'), { recursive: true });
+  fs.copyFileSync(path.join(project, 'src/pages/humans.txt.ts'), path.join(fixture, 'src/pages/humans.txt.ts'));
+  fs.copyFileSync(path.join(project, 'src/pages/404.astro'), path.join(fixture, 'src/pages/404.astro'));
   for (const name of ['associati', 'sostienici']) {
     fs.mkdirSync(path.join(fixture, 'src/pages', name), { recursive: true });
     fs.copyFileSync(path.join(project, 'src/pages', name, 'index.astro'), path.join(fixture, 'src/pages', name, 'index.astro'));
@@ -98,6 +106,7 @@ Astro.locals.associationInfo = Promise.resolve(${JSON.stringify(identity)});
   await build({
     root: fixture,
     configFile: false,
+    site: 'https://example.org',
     base: '/Assoe/',
     logLevel: 'silent',
     vite: { resolve: { alias: { '@': path.join(fixture, 'src') } } },
@@ -127,7 +136,32 @@ Astro.locals.associationInfo = Promise.resolve(${JSON.stringify(identity)});
   assert.equal(home.querySelector('.brand').getAttribute('aria-label'), `${fullName}, pagina iniziale`);
   assert.equal(home.querySelector('h1').textContent, fullName);
   assert.equal(home.title, fullName);
-  assert.equal(home.querySelector('meta[name="description"]').content, fullName);
+  assert.equal(home.querySelector('meta[name="description"]').content, `Volontariato, iniziative sociali, eventi e racconti di ${fullName}.`);
+  assert.equal(home.querySelector('link[rel="canonical"]').href, 'https://example.org/Assoe/');
+  assert.equal(home.querySelector('meta[property="og:url"]').content, 'https://example.org/Assoe/');
+  assert.equal(home.querySelector('meta[property="og:title"]').content, fullName);
+  assert.equal(home.querySelector('meta[property="og:description"]').content, home.querySelector('meta[name="description"]').content);
+  assert.equal(home.querySelector('footer a[href="/Assoe/privacy/"]').textContent, 'Privacy');
+  assert.equal(home.querySelector('footer .site-footer__bottom-links--contact-only'), null);
+  const privacy = document('privacy');
+  assert.match(privacy.body.textContent, /Il titolare è Nome dal CMS Seconda parte ODV/);
+  assert.match(privacy.body.textContent, /Via del CMS 42, 00100 Roma RM/);
+  assert.match(privacy.body.textContent, /01234567890/);
+  assert.match(privacy.body.textContent, /RUNTS n\. 12345/);
+  assert.equal(privacy.querySelectorAll('a[href="mailto:contatti-cms@example.org"]').length, 2);
+  assert.match(privacy.querySelector('meta[name="description"]').content, /Nome dal CMS Seconda parte ODV/);
+  assert.doesNotMatch(privacy.body.textContent, /93038190638|info@assoe\.it|Via Ponti Rossi/);
+  assert.equal(privacy.querySelector('time').getAttribute('datetime'), '2026-11-26');
+  const security = fs.readFileSync(path.join(fixture, 'dist/.well-known/security.txt'), 'utf8');
+  assert.match(security, /^Contact: mailto:contatti-cms@example.org\nExpires: /);
+  assert.ok(new Date(security.match(/^Expires: (.+)$/m)[1]).getTime() > Date.now());
+  const humans = fs.readFileSync(path.join(fixture, 'dist/humans.txt'), 'utf8');
+  assert.match(humans, /Contenuti: Nome dal CMS Seconda parte ODV\nContatto associazione: contatti-cms@example.org/);
+  assert.equal(privacy.querySelector('iframe, form, script[src^="https:"]'), null);
+  const missing = new JSDOM(fs.readFileSync(path.join(fixture, 'dist/404.html'), 'utf8')).window.document;
+  assert.equal(missing.querySelector('meta[http-equiv="refresh"]').content, '0;url=/Assoe/');
+  assert.equal(missing.querySelector('a').getAttribute('href'), '/Assoe/');
+  assert.doesNotMatch(missing.body.textContent, /404|not found/i);
   assert.equal(home.querySelector('.site-footer__identity > strong').textContent, fullName);
   assert.match(home.querySelector('.five-per-mille').textContent, /Nome dal CMS Seconda parte ODV/);
   assert.equal(document('chi-siamo').title, `Chi siamo | ${fullName}`);

@@ -1,0 +1,52 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { contentRepository } from '@/content';
+import { getPageAssociation } from '@/utils/association';
+import { legalInformation } from '@/utils/legalInformation';
+
+const association = await getPageAssociation(Astro.locals, contentRepository);
+const identity = legalInformation(association);
+---
+
+<BaseLayout title="Privacy" description={`Informazioni sui dati personali, sui cookie e sui servizi utilizzati dal sito di ${identity.name}.`} {association}>
+  <main id="contenuto" class="container detail">
+    <header class="page-intro">
+      <h1>Privacy</h1>
+      <p>Informativa sul trattamento dei dati personali durante la consultazione del sito e il contatto con l’associazione, ai sensi dell’articolo 13 del Regolamento (UE) 2016/679.</p>
+      <p>Ultimo aggiornamento: <time datetime="2026-11-26">26 novembre 2026</time>.</p>
+    </header>
+
+    <div class="detail__body">
+      <h2>Il titolare del trattamento</h2>
+      <p>Il titolare è {identity.name}, con sede in {identity.address}, codice fiscale {identity.taxCode}.</p>
+      {identity.registryInfo && <p>{identity.registryInfo}</p>}
+      <p>Per informazioni sulla privacy e per esercitare i tuoi diritti puoi scrivere a <a href={identity.emailHref}>{identity.email}</a>.</p>
+
+      <h2>Dati di navigazione e sicurezza</h2>
+      <p>Il sito è statico: le pagine vengono generate prima della visita. Non sono presenti account per i visitatori, moduli di invio dati, sistemi pubblicitari o strumenti di analisi del comportamento.</p>
+      <p>L’hosting è fornito da GitHub Pages. Quando visiti il sito, GitHub registra l’indirizzo IP per finalità di sicurezza, anche se non possiedi un account GitHub. I dati tecnici possono comprendere le informazioni trasmesse dal browser necessarie a consegnare le pagine e proteggere il servizio.</p>
+      <p>La finalità è consentire la consultazione e tutelare il funzionamento del sito; la base giuridica, per i trattamenti di competenza dell’associazione, è il legittimo interesse alla comunicazione delle proprie attività e alla sicurezza del servizio, ai sensi dell’articolo 6, paragrafo 1, lettera f) del GDPR.</p>
+      <p>Per i trattamenti svolti da GitHub, i relativi tempi di conservazione e le informazioni sui trasferimenti internazionali, consulta la <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">Privacy Statement di GitHub</a> e la <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection">descrizione dei dati raccolti da GitHub Pages</a>.</p>
+
+      <h2>Quando ci scrivi</h2>
+      <p>Se scegli di contattarci via email, l’associazione riceve il tuo indirizzo e i dati che inserisci nel messaggio. Sono utilizzati per leggere e gestire la richiesta e risponderti. Il conferimento è facoltativo; senza un recapito o le informazioni necessarie potremmo non riuscire a rispondere.</p>
+      <p>La base giuridica è il legittimo interesse a gestire la corrispondenza e le richieste di informazioni; se la richiesta riguarda un’adesione o un servizio, possono applicarsi le misure precontrattuali richieste dall’interessato, ai sensi dell’articolo 6, paragrafo 1, lettera b) del GDPR. Gli eventuali adempimenti previsti dalla legge si basano sulla lettera c) dello stesso articolo.</p>
+      <p>Le richieste sono conservate per il tempo necessario alla loro gestione. Un’ulteriore conservazione è limitata agli obblighi di legge o alla necessità di accertare, esercitare o difendere un diritto. Non inviare dati sensibili o documenti personali non necessari alla tua richiesta.</p>
+
+      <h2>Chi può trattare i dati</h2>
+      <p>I dati delle richieste sono accessibili alle persone autorizzate dall’associazione e ai fornitori dei servizi tecnici e di posta coinvolti nella loro gestione, nei rispettivi ruoli previsti dalla normativa. Possono essere comunicati alle autorità quando richiesto dalla legge. I messaggi ricevuti non sono pubblicati sul sito.</p>
+
+      <h2>Cookie, font e contenuti esterni</h2>
+      <p>Il sito non imposta cookie, non usa la memoria del browser per tracciare le visite e non effettua profilazione o decisioni automatizzate. Non è quindi presente un banner di consenso.</p>
+      <p>I font e le immagini delle pagine sono serviti insieme al sito. Sanity è utilizzato per la gestione editoriale e la generazione dei contenuti: il browser dei visitatori non interroga il CMS durante la consultazione delle pagine.</p>
+      <p>I social network sono collegati con semplici link e non sono incorporati nelle pagine. Se apri un collegamento esterno, un PDF o una foto originale ospitati su Sanity, il tuo browser contatta il relativo servizio, che riceve i dati tecnici della richiesta. Si applicano le informative del servizio di destinazione, fra cui la <a href="https://www.sanity.io/legal/privacy">Privacy Policy di Sanity</a>.</p>
+
+      <h2>I tuoi diritti</h2>
+      <p>Nei casi previsti dal GDPR puoi chiedere accesso, rettifica, cancellazione, limitazione del trattamento e portabilità dei tuoi dati, e opporti ai trattamenti basati sul legittimo interesse. Per le richieste rivolte all’associazione scrivi a <a href={identity.emailHref}>{identity.email}</a>.</p>
+      <p>Puoi presentare reclamo al <a href="https://www.garanteprivacy.it/">Garante per la protezione dei dati personali</a>, secondo le modalità indicate sul suo sito.</p>
+
+      <h2>Ambito dell’informativa</h2>
+      <p>Questa informativa riguarda il sito e le richieste di contatto. Per i trattamenti legati all’adesione, al volontariato o ai servizi dell’associazione occorre fare riferimento alle informazioni fornite per ciascuna attività. Per chiarimenti puoi contattare l’associazione.</p>
+    </div>
+  </main>
+</BaseLayout>

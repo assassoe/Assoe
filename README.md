@@ -1,225 +1,135 @@
 # Asso è… La Strada ci Insegna ODV
 
-Sito web dell’associazione **Asso è… La Strada ci Insegna ODV**. Presenta le attività, le iniziative, gli eventi e le notizie dell’associazione, con informazioni per associarsi e sostenerne i progetti.
+Sito dell’associazione **Asso è… La Strada ci Insegna ODV**, dedicato a iniziative sociali, volontariato, eventi e racconti, con informazioni per associarsi e sostenere le attività.
 
-Il sito è sviluppato con [Astro](https://astro.build/) e TypeScript. I contenuti sono gestiti con [Sanity](https://www.sanity.io/) attraverso uno Studio dedicato, incluso nel repository.
+Il frontend usa [Astro](https://astro.build/) e TypeScript; i contenuti sono gestiti con [Sanity](https://www.sanity.io/). Il repository comprende sia il sito sia lo Studio editoriale.
 
 ## Come funziona
 
-Astro genera il sito statico usando i contenuti pubblicati su Sanity. Il browser dei visitatori riceve le pagine già generate, senza interrogare il CMS.
+Astro genera pagine statiche usando i contenuti pubblicati su Sanity. Le bozze restano escluse e il browser dei visitatori non interroga il CMS.
 
-Lo Studio permette di gestire informazioni dell’associazione, avvisi della homepage, iniziative, articoli, eventi e profili delle persone. Le bozze restano escluse dal sito pubblico. Per rendere visibili gli aggiornamenti pubblicati nel CMS è necessaria una nuova build del sito.
+**Pubblicare un contenuto su Sanity e aggiornare il sito sono due operazioni distinte:** per rendere visibili le modifiche serve una nuova build. Lo Studio viene distribuito separatamente dal sito.
 
-## Requisiti
+## Avvio locale
 
-- Node.js 24 e npm.
-- Identificativo del progetto Sanity e nome del dataset.
-- Accesso al progetto Sanity per utilizzare lo Studio e modificare i contenuti.
+Servono **Node.js 24**, npm, l’identificativo del progetto Sanity e il nome del dataset. Sito e Studio hanno dipendenze e configurazioni separate.
 
-Il sito e lo Studio hanno dipendenze e file di configurazione separati.
+Dalla radice del repository, installare entrambe le dipendenze:
 
-## Sviluppo locale
+```bash
+npm ci
+npm ci --prefix studio
+```
 
-### Sito
-
-Dalla radice del repository:
+Alla prima configurazione, creare i file di ambiente dagli esempi. Conservare quelli già esistenti:
 
 ```bash
 cp .env.example .env
-npm ci
+cp studio/.env.example studio/.env
 ```
 
-Configurare `.env` con l’identificativo del progetto Sanity e il dataset da utilizzare:
+Compilare le variabili nei rispettivi file:
 
-```dotenv
-PUBLIC_SANITY_PROJECT_ID=<id-progetto>
-PUBLIC_SANITY_DATASET=production
-```
+| File | Variabili |
+| --- | --- |
+| `.env` | `PUBLIC_SANITY_PROJECT_ID`, `PUBLIC_SANITY_DATASET` |
+| `studio/.env` | `SANITY_STUDIO_PROJECT_ID`, `SANITY_STUDIO_DATASET` |
 
-Avviare il server di sviluppo su `http://localhost:4322/`:
+Il dataset predefinito è `production`. Per lavorare sugli stessi contenuti, sito e Studio devono usare lo stesso progetto e dataset.
+
+Avviare il sito su `http://localhost:4322/`:
 
 ```bash
 npm run dev
 ```
 
-### Studio Sanity
-
-In un terminale separato:
+In un altro terminale, avviare lo Studio:
 
 ```bash
-cd studio
-cp .env.example .env
-npm ci
+npm --prefix studio run dev
 ```
 
-Configurare `studio/.env` con il progetto e il dataset da gestire:
+Lo Studio mostra nel terminale il proprio indirizzo locale. Le modifiche pubblicate anche dallo Studio locale aggiornano il dataset configurato: usare un dataset separato per le prove. Non modificare o cancellare contenuti di produzione per risolvere errori di build senza verificarne prima tipo, stato e dataset.
 
-```dotenv
-SANITY_STUDIO_PROJECT_ID=<id-progetto>
-SANITY_STUDIO_DATASET=production
-```
+I file `.env` sono esclusi da Git. Non inserire token, credenziali o dati riservati nel repository o nelle variabili esposte al browser.
 
-Avviare lo Studio:
-
-```bash
-npm run dev
-```
-
-Per lavorare sugli stessi contenuti, sito e Studio devono puntare allo stesso progetto e dataset. Le modifiche pubblicate dallo Studio locale aggiornano il dataset configurato: utilizzare un dataset separato per contenuti di prova. Gli elenchi e i dettagli delle iniziative del server di sviluppo rileggono Sanity a ogni richiesta: ricaricare la pagina recepisce aggiunte, eliminazioni e spostamenti, compresi i cambiamenti della paginazione.
-
-I file `.env` sono esclusi da Git. Credenziali, token e dati riservati devono restare fuori dal repository e dalle variabili esposte al browser.
-
-## Struttura del repository
+## Struttura
 
 | Percorso | Contenuto |
 | --- | --- |
-| `src/pages/` | Pagine e percorsi del sito |
-| `src/layouts/` | Struttura condivisa delle pagine |
-| `src/components/` | Componenti dell’interfaccia |
-| `src/styles/` | Stili globali e responsive |
-| `src/config/` | Configurazione del sito e della navigazione |
-| `src/content/` | Modello dei contenuti e integrazione con Sanity |
-| `src/utils/` | Funzioni di supporto al frontend |
-| `shared/` | Funzioni e validazioni condivise con lo Studio |
-| `studio/` | Configurazione, schemi e interfaccia dello Studio Sanity |
-| `scripts/` | Verifiche dell’output e generazione degli avvisi di licenza |
-| `tests/` | Test automatici |
+| `src/pages/`, `src/layouts/` | Percorsi e struttura delle pagine |
+| `src/components/`, `src/styles/` | Interfaccia e stili |
+| `src/content/` | Modello dei contenuti e letture da Sanity |
+| `src/config/`, `src/utils/`, `shared/` | Configurazione e funzioni di supporto |
+| `studio/` | Schemi e interfaccia dello Studio Sanity |
+| `scripts/`, `tests/` | Build, verifiche e test automatici |
 
-Il modello dei contenuti è definito in [`src/content/types.ts`](src/content/types.ts). Query, validazione e conversione dei documenti Sanity sono raccolte in [`src/content/providers/`](src/content/providers/).
+Le pagine dipendono dal contratto in [src/content/types.ts](src/content/types.ts); query, validazione e mapping del CMS sono in [src/content/providers/](src/content/providers/). Le modifiche al modello devono mantenere coerenti schemi Studio, query, mapper e test.
 
-## Contenuti Sanity
+## Gestione dei contenuti
 
-Il sito legge questi documenti:
+Lo Studio gestisce informazioni dell’associazione, homepage e avvisi, iniziative nei due ambiti **Iniziative sociali** e **Volontariato**, articoli, eventi e persone. Articoli ed eventi possono essere collegati alle iniziative; gli articoli possono raccontare un evento.
 
-- **Homepage**: documento singleton `homeSettings` con le schede **Ordine delle sezioni** e **Avvisi**. Nella prima si trascinano Avvisi, Prossimo appuntamento, Iniziative sociali, Volontariato, Articoli e 5×1000; la presentazione iniziale resta in alto. Nei documenti già esistenti premere **Configura l’ordine delle sezioni** per iniziare. Pubblicare e ricostruire il sito applica il nuovo ordine, senza cambiare la selezione o l’ordine dei contenuti interni. Se il campo non è configurato si conserva l’ordine attuale; dati incompleti o corrotti non nascondono sezioni: quelle mancanti sono aggiunte in fondo nell’ordine predefinito. Il nuovo pannello richiede il deploy dello Studio.
-- **Avvisi**: nella scheda omonima di **Homepage**, fino a tre e riordinabili trascinandoli nello Studio. Titolo e testo non possono essere vuoti o composti solo da spazi. Il testo usa Markdown (massimo 500 caratteri di sorgente); un PDF e un link HTTPS sono facoltativi. Il testo del link è personalizzabile (massimo 80 caratteri); se vuoto, compare «Approfondisci». Ogni avviso può avere una data «Visibile fino al»: resta visibile per tutta quella data nel fuso italiano e scompare dal giorno successivo. Gli avvisi scaduti occupano ancora un posto nell’elenco dello Studio; rimuoverli quando non servono più. La sezione non compare se non ci sono avvisi visibili.
-- **Informazioni associazione**: documento singleton con **Nome breve** (per esempio «Asso è…») e **Seconda parte del nome** («La Strada Ci Insegna ODV»), entrambi obbligatori e mostrati su due righe nell’header. Il sito compone il nome completo per homepage, footer, titoli delle pagine, riferimenti e accessibilità; i richiami brevi usano il primo campo. Il vecchio nome completo resta nascosto come compatibilità per i documenti non ancora aggiornati. Per usare i nuovi campi occorre distribuire lo Studio, compilarli e pubblicare il documento, quindi ricostruire il sito. La scheda contiene anche testo breve della homepage (facoltativo, massimo 200 caratteri), logo, descrizione, contatti, social, donazioni, 5×1000 e documenti. Il modulo di iscrizione PDF è facoltativo: quando presente compare fra i documenti di Chi siamo e nella sezione per unirsi all’associazione; se assente resta il contatto diretto.
-- **Iniziative**: un solo tipo di documento con ambito obbligatorio **Iniziative sociali** o **Volontariato**. Nello Studio, “Iniziative” contiene i due ambiti, ciascuno con “Elenco e ricerca” e il proprio riordino trascinabile. Il menu desktop e mobile offre due voci distinte, **Volontariato** e **Iniziative sociali**, dirette ai rispettivi elenchi, senza pulsanti interni per passare da un ambito all’altro. Il vecchio percorso `/iniziative/` reindirizza alla home; Chi siamo e la presentazione iniziale della home collegano direttamente entrambi gli ambiti. La home mostra le prime due iniziative di ciascun ambito nell’ordine editoriale. Cambiare “Ambito”, pubblicare e ricostruire il sito sposta l’iniziativa mantenendo URL e collegamenti; la posizione si sceglie nel riordino del nuovo ambito. Il provider esclude iniziative senza un ambito valido, anche dai contenuti correlati. Nel dettaglio di ogni iniziativa le storie sono paginate a gruppi di sei, con pagine successive sotto `/iniziative/<slug>/pagina/<numero>/`; presentazione, sezioni istituzionali e tutti gli eventi collegati restano visibili su ogni pagina.
-- **Articoli**: racconti e approfondimenti con data, immagini, galleria e collegamenti opzionali alle iniziative e all’evento raccontato. La scheda evento elenca gli articoli che lo raccontano; ogni articolo rimanda al proprio evento. Le campagne possono essere articoli autonomi, senza un appuntamento di calendario. Attivando **In evidenza nella homepage** si scelgono fino a cinque preferiti. La home mostra quattro articoli totali: prima i preferiti più recenti, poi gli ultimi articoli non già inclusi per riempire i posti liberi. La linea del tempo è verde, con stelline gialle soltanto sui preferiti e pallini rossi sugli altri. Lo Studio controlla il limite contando ogni articolo una volta fra bozze e pubblicati; per sostituirne uno, togliere la spunta e pubblicarlo prima di selezionare il nuovo. Senza preferiti la home mostra i quattro più recenti; con meno di quattro articoli disponibili mostra soltanto quelli esistenti. La prima pagina Articoli mostra fino a cinque preferiti nella sezione “In evidenza”, con linea verde e stelline gialle, seguiti dall’elenco completo paginato. Richiede il deploy dello Studio e una nuova build del sito. I ricordi storici senza una data verificata omettono la data e seguono gli articoli datati negli elenchi; il loro URL non contiene una data. Le correzioni registrate in `legacyArticleSlugs` conservano i vecchi indirizzi tramite rimandi diretti.
-- **Eventi**: in `/eventi/` il prossimo appuntamento è mostrato solo quando disponibile, seguito da tutti gli eventi passati, filtrabili per anno e paginati a gruppi di sei. I percorsi `/eventi/archivio/` restano accessibili con la stessa vista unificata. L’archiviazione scatta dal giorno successivo nel fuso italiano, indipendentemente dallo stato, e si aggiorna alla build quotidiana o manuale. Gli annullamenti restano visibili; gli altri passati sono mostrati come conclusi. Nello Studio, **Eventi → Tutti gli eventi** offre l’elenco completo; **Eventi → Per iniziativa** permette di scegliere un’iniziativa, cercarne gli eventi e crearne uno con “Iniziative collegate” già compilato. Un evento collegato a più iniziative compare in ciascuna; quelli senza collegamenti restano nell’elenco completo. La navigazione include anche iniziative inattive ed eventi passati o annullati. Richiede il deploy dello Studio.
-- **Persone**: nella pagina Associati le tessere compatte sono raggruppate in **Direttivo**, **Servizio civile** e **Associati**. Il direttivo unisce presidente, vice, segretario e consiglieri nell’ordine dei ruoli; restano visibili le cariche delle singole persone. Dentro ogni ruolo si conserva l’ordine editoriale. Chi siamo mantiene la propria presentazione del direttivo.
+L’ordine delle iniziative e delle sezioni della homepage è editoriale. La configurazione istituzionale delle iniziative è affidata a Danilo ed è accessibile dal menu secondario delle schede.
 
-Le iniziative usano il tipo **`initiative`**; articoli ed eventi le collegano tramite il campo **`initiatives`**.
+Per gli articoli si inserisce lo slug breve: il sito aggiunge la data all’URL quando disponibile. Cambiare data o slug può cambiare l’indirizzo pubblico; preservare i vecchi collegamenti attraverso gli alias previsti dal modello.
 
-Le iniziative supportano **contenuti istituzionali facoltativi**, accessibili dal menu secondario della scheda con **Configurazione istituzionale · Danilo**. Il modulo ordinario non mostra l’editor; se esistono sezioni configurate, mostra soltanto una nota. L’avviso «MI RACCOMANDO: NON USARE QUESTA SEZIONE» affida l’utilizzo a Danilo per i casi documentati: è una regola organizzativa, senza restrizioni aggiuntive sugli account. Nell’editor si aggiungono e riordinano testi, comunicazioni con periodo di riferimento, loghi ufficiali, PDF e dati in evidenza senza indicatori predefiniti. Per marchi con composizione prescritta si carica il blocco ufficiale completo. Aprire o chiudere l’editor non modifica i contenuti; le modifiche seguono le normali bozze e la pubblicazione Sanity. Chiudere non annulla le modifiche. Nel dettaglio dell’iniziativa i loghi e un richiamo sintetico alle comunicazioni istituzionali compaiono vicino alla presentazione. I testi completi delle comunicazioni, gli approfondimenti, i PDF e i dati in evidenza compaiono in fondo, dopo racconti ed eventi. All’interno di ciascuna zona resta l’ordine editoriale; tutte le informazioni sono presenti anche nelle pagine successive degli articoli. Il periodo è descrittivo e non provoca scadenze o rimozioni automatiche. La funzione richiede il deploy dello Studio e una nuova build del sito; non compila automaticamente dichiarazioni né attesta conformità normativa.
-
-Gli articoli derivati dalla riclassificazione di un evento possono conservare il suo vecchio slug nel campo tecnico `legacyEventSlug`. La build genera un rimando dal precedente indirizzo evento all’articolo; se l’evento viene ripristinato, la sua pagina torna ad avere precedenza.
-
-Gli URL pubblici sono:
-
-- `/iniziative-sociali/`
-- `/volontariato/`
-- `/iniziative/<slug>/`
-- `/articoli/`
-- `/articoli/<data>-<slug>/`
-- `/eventi/`
-- `/eventi/archivio/` e `/eventi/archivio/<anno>/`
-- `/eventi/<slug>/`
-
-Per gli articoli, nello Studio si inserisce solo la parte breve dello slug, senza la data. La data viene aggiunta automaticamente dal sito. Cambiare data o slug dopo la pubblicazione cambia l’indirizzo pubblico.
-
-Per gli eventi, lo slug `archivio` è riservato alla pagina del sito.
-
-Il sito usa solo contenuti pubblicati. Una bozza Sanity non viene inclusa nella build.
-
-## Immagini e documenti
-
-Prima di caricare immagini diverse dal logo, preferire JPG o WebP, circa 2000 px sul lato lungo e massimo 5 MB. Le immagini vengono ottimizzate da Astro durante la build, ma gli originali restano archiviati su Sanity.
-
-Le gallerie si aprono a tutta finestra su sfondo scuro, con zoom dal 100% al 400%, pulsanti, rotella, doppio click e trascinamento con il mouse. Su touch restano disponibili scorrimento e pinch nativi. Il comando Schermo intero compare quando supportato dal browser; è sempre disponibile il collegamento all’originale. Le foto del visualizzatore sono generate fino a 2400 px sul lato orizzontale, senza aumentare la risoluzione del file sorgente.
-
-Le immagini del logo sono soggette a una regola separata nello Studio. Prima di pubblicare documenti o dati bancari verificare sempre che siano corretti e destinati alla pubblicazione. Per le foto delle persone occorre avere il consenso necessario.
+Per le immagini, escluso il logo, preferire JPG o WebP, circa 2000 px sul lato lungo e massimo 5 MB. Astro le ottimizza durante la build; gli originali restano su Sanity. Verificare diritti sulle immagini, consenso necessario per le foto e correttezza dei documenti prima di pubblicarli.
 
 ## Verifiche e build
 
-I comandi seguenti si eseguono dalla radice del repository, dopo aver installato le dipendenze. I test dell’editor usano anche React dallo Studio: prima di eseguire la suite o la copertura installare le sue dipendenze con `npm ci --prefix studio`. La CI esegue entrambe le installazioni.
+I comandi seguenti si eseguono dalla radice. Anche i test richiedono le dipendenze dello Studio installate.
 
 | Comando | Funzione |
 | --- | --- |
 | `npm run check` | Controlla tipi e componenti Astro |
 | `npm test` | Esegue i test automatici |
-| `npm run test:coverage` | Verifica la copertura dei test e le soglie configurate |
-| `npm run quality:report` | Esegue i controlli di sito e Studio e salva la scheda di qualità in `quality-reports/local/` |
+| `npm run test:coverage` | Verifica copertura e soglie configurate |
 | `npm run build` | Genera il sito statico in `dist/` |
-| `npm run check:build` | Verifica pagine, collegamenti e struttura dell’ultima build |
-| `npm run preview` | Serve l’ultima build su `http://localhost:4323/` |
+| `npm run check:build` | Controlla HTML, collegamenti e struttura dell’ultima build |
+| `npm run preview` | Serve la build su `http://localhost:4323/` |
+| `npm audit --omit=dev --audit-level=high` | Verifica le dipendenze del sito |
+| `npm run quality:report` | Raccoglie verifiche e report di sito e Studio |
 
-La generazione del sito richiede la configurazione Sanity e una connessione di rete per leggere i contenuti e scaricare le immagini. Le immagini sono ottimizzate durante la build. La preview legge i file di `dist/` e cambia soltanto dopo una nuova build; per lavorare sui contenuti Sanity usare il server di sviluppo sulla porta 4322.
+La build richiede configurazione Sanity valida e accesso alla rete per contenuti e immagini. La preview legge `dist/` e cambia soltanto dopo una nuova build; per lo sviluppo usare `npm run dev`.
 
-Per verificare lo Studio, con le sue dipendenze già installate:
+Per verificare lo Studio:
 
 ```bash
 npm --prefix studio run build
 npm --prefix studio run audit:high
 ```
 
-## Test e copertura
+I test usano `node:test`. La copertura richiede almeno il 95% delle righe, il 90% dei rami e il 100% delle funzioni nel [perimetro configurato](scripts/coverage-scope.mjs); componenti Astro e CSS sono esclusi da questa misura.
 
-Le suite in [`tests/`](tests/) usano `node:test`: verificano regole dei contenuti, separazione delle iniziative per ambito, provider Sanity, cache, upload dello Studio, gestione degli errori dell’audit e script di avvisi e galleria in un DOM simulato. Combinano verifiche black box sui risultati e white box su chiamate, stato e percorsi del codice. Le query delle iniziative sono eseguite anche localmente con groq-js, senza accedere al CMS o a un browser reale.
-
-I test dell’ordine della homepage verificano validazione, compatibilità con i documenti esistenti, query GROQ e cache. Una build Astro temporanea con contenuti di prova controlla anche l’HTML delle sezioni in ordine predefinito e invertito, comprese le sezioni senza contenuti, senza interrogare Sanity.
-
-`npm run test:coverage` misura con V8 righe, rami e funzioni eseguiti, con soglie complessive del **95%**, **90%** e **100%**. Il [perimetro](scripts/coverage-scope.mjs) comprende utilità, script, provider, moduli condivisi, struttura degli elenchi dello Studio, i suoi moduli di validazione e upload e i tre moduli del report di qualità; esclude componenti Astro, CSS e interfaccia React. Il [controllo](scripts/test-coverage.mjs) fallisce anche se un modulo previsto non compare nel report. Le percentuali descrivono l’esecuzione del codice incluso, non la copertura di tutti i requisiti.
-
-`npm run audit:high` nello Studio richiede un report npm valido e fallisce anche per errori di rete o di esecuzione. L’override mirato di `undici` nel plugin dei tipi impone la versione corretta della serie 7; le eventuali eccezioni alle advisory restano definite nello script di audit.
-
-### Scheda di qualità
-
-`npm run quality:report` raccoglie test, copertura, controllo Astro, build, verifica HTML e audit, senza interrompere i controlli indipendenti dopo un errore. Richiede entrambe le installazioni delle dipendenze e la configurazione Sanity della build; usa il client npm dell’invocazione corrente e `/usr/bin/git`, come disponibili su macOS e nei runner Ubuntu. Aprire `quality-reports/local/report.html`; la stessa cartella contiene report Markdown, dati JSON e log. Le destinazioni personalizzate devono restare in `quality-reports/` e non possono attraversare collegamenti simbolici. L’esportatore SonarQube scrive solo nella propria destinazione fissa. Un controllo HTML non viene eseguito se la build di quella esecuzione fallisce. Gli output sono esclusi da Git. `npm run test:coverage` conserva inoltre `coverage/lcov.info`. La CI installa le dipendenze con `npm ci --ignore-scripts`; la Action SonarQube è fissata al commit della versione dichiarata nel workflow.
-
-Il workflow Quality checks genera una sintesi GitHub e un artefatto `quality-report-<commit>` scaricabile, conservato per 90 giorni nei limiti delle impostazioni del repository. I report identificano commit, eventuale merge di prova delle pull request, modifiche locali, impronta dei sorgenti, strumenti e perimetro. Le build leggono i contenuti Sanity correnti: il commit non congela il CMS. L’esito resta incompleto se manca SonarQube; i fallimenti dei controlli obbligatori mantengono la CI in errore. Il report non è una certificazione e non modifica le regole di integrazione o il workflow Pages.
-
-La scansione facoltativa **SonarQube Cloud** richiede un progetto, le variabili Actions `SONAR_PROJECT_KEY` e `SONAR_ORGANIZATION` e il secret `SONAR_TOKEN`. Nell’impostazione del progetto scegliere l’analisi con GitHub Actions e disattivare quella automatica per importare la copertura LCOV. Il workflow esegue la scansione sul ramo principale e sulle pull request dirette a quel ramo; `SONAR_ALL_BRANCHES=true` abilita gli altri rami solo dopo aver verificato che il piano lo consenta. SonarQube è inizialmente informativo: registra il Quality Gate della specifica analisi senza aggiungere un blocco delle integrazioni. I file `.astro` sono esclusi dalla scansione e restano verificati dai controlli dedicati; la copertura SonarQube usa un perimetro più ampio di quella V8 e può differire. La configurazione nel repository non prova che il servizio esterno sia attivo.
+Il report locale si apre da `quality-reports/local/report.html`. La CI [Quality checks](.github/workflows/ci.yml) esegue i controlli e conserva report scaricabili. La scansione SonarQube Cloud è facoltativa e richiede configurazione esterna; il suo esito è distinto dai controlli obbligatori.
 
 ## Pubblicazione
 
-`develop` raccoglie le modifiche da verificare; `main` contiene la versione pubblicata. Integrare i branch di funzionalità in `develop`, completare i controlli e portare il risultato in `main`. Dopo il rilascio, sincronizzare `develop` con `main`, includendo anche le eventuali correzioni applicate direttamente a `main`.
+`develop` raccoglie le modifiche da verificare; `main` è il ramo di pubblicazione. Completare i controlli prima di integrare su `main`, poi sincronizzare `develop`.
 
-Il workflow [Quality checks](.github/workflows/ci.yml) esegue le verifiche del sito e dello Studio sui push e sulle pull request.
+Il workflow [Publish Astro to GitHub Pages](.github/workflows/pages.yml) legge `main`, genera il sito e lo pubblica su push, avvio manuale o pianificazione quotidiana. Usa le variabili Actions `PUBLIC_SANITY_PROJECT_ID` e `PUBLIC_SANITY_DATASET`, con `production` come dataset predefinito. La build quotidiana aggiorna anche la distinzione fra eventi futuri e passati.
 
-Il workflow [Publish Astro to GitHub Pages](.github/workflows/pages.yml) genera e pubblica il sito dai contenuti di `main`, su push, avvio manuale o pianificazione quotidiana. Usa le variabili GitHub Actions `PUBLIC_SANITY_PROJECT_ID` e `PUBLIC_SANITY_DATASET`, con `production` come dataset predefinito. La configurazione degli indirizzi di pubblicazione è definita nel workflow e in [`astro.config.mjs`](astro.config.mjs).
+La configurazione attuale pubblica un’anteprima GitHub Pages sotto il percorso del repository, con `noindex,nofollow`. Il dominio personalizzato richiede configurazione DNS e aggiornamento di `SITE_URL`, `SITE_BASE` e `PUBLIC_SITE_PREVIEW` nel workflow. Gli indirizzi dipendono anche da [astro.config.mjs](astro.config.mjs).
 
-Lo Studio viene distribuito separatamente. Da una sessione autenticata a Sanity:
+Per distribuire lo Studio, da una sessione autenticata a Sanity:
 
 ```bash
 npm --prefix studio run deploy
 ```
 
-Le modifiche agli schemi e all’interfaccia dello Studio richiedono un nuovo deploy dello Studio; la pubblicazione del sito resta gestita dal workflow GitHub Pages.
+Le modifiche agli schemi o all’interfaccia editoriale richiedono questo deploy. Per aggiornare i contenuti del sito, pubblicarli in Sanity e verificare che una successiva build Pages termini correttamente. In caso di errore, consultare i log e ripetere il workflow dopo aver risolto il problema.
 
-## Aggiornamento dei contenuti e build
+## File tecnici e privacy
 
-Pubblicare un documento in Sanity e ricostruire il sito sono due operazioni distinte. Il sito si aggiorna solo dopo una nuova build Pages.
+La build genera `robots.txt` e una sitemap delle pagine indicizzabili, escludendo redirect e 404. Nell’anteprima la sitemap resta vuota. Le pagine includono canonical, descrizioni e Open Graph; gli indirizzi inesistenti riportano automaticamente alla home.
 
-Per verificare che un aggiornamento sia arrivato online:
+La pagina `/privacy/`, `humans.txt` e `/.well-known/security.txt` usano i dati dell’associazione pubblicati in Sanity. La scadenza di security viene rinnovata a 180 giorni dalla build. Dati obbligatori mancanti o recapiti non validi interrompono la generazione. Per la discovery standard, robots e security devono essere serviti alla radice del dominio.
 
-1. controllare che il documento sia **Published**, non solo Draft;
-2. verificare che il tipo sia quello previsto dallo schema;
-3. controllare in **GitHub → Actions** che `Publish Astro to GitHub Pages` sia partito e terminato con successo;
-4. se necessario, avviare manualmente il workflow su `main`;
-5. ricaricare la pagina senza cache dopo il deploy.
-
-Un webhook Sanity può avviare automaticamente la build, ma questa integrazione va verificata nelle impostazioni del progetto Sanity e nei log di GitHub Actions: il solo salvataggio o la pubblicazione in Sanity non garantisce una nuova build.
-
-Il passaggio automatico di un evento da futuro a passato non è una modifica in Sanity. La build quotidiana aggiorna questa distinzione e recepisce gli altri contenuti pubblicati dopo la build precedente. Un deploy non è però un backup dei dati Sanity: se la build fallisce, controllare il workflow e avviarlo nuovamente quando il problema è risolto.
-
-Gli avvisi della homepage fanno eccezione: quelli già scaduti sono esclusi durante la build, mentre un piccolo script locale nasconde quelli che scadono dopo l’ultima build, senza interrogare Sanity. Senza JavaScript, una pagina già generata conserva gli avvisi fino alla build successiva.
-
-## Routing e GitHub Pages
-
-Il sito usa il prefisso configurato da `SITE_BASE` quando viene pubblicato in una sottocartella. Le pagine inesistenti usano `src/pages/404.astro` per reindirizzare alla home, così il visitatore non resta su una pagina 404 dell’applicazione.
-
-Il workflow ricava il proprietario e il nome del repository da GitHub per configurare l’indirizzo Pages. Un dominio personalizzato richiede la configurazione DNS e l’aggiornamento di `SITE_URL` e `SITE_BASE` nel workflow.
-
-## Note operative
-
-- Non committare `.env`, token, sessioni Sanity o dati sensibili.
-- Non modificare o cancellare documenti Sanity per risolvere un problema di build senza prima verificare tipo, stato di pubblicazione e dataset.
-- Dopo modifiche agli schemi, distribuire lo Studio online prima di creare nuovi contenuti.
-- Prima di un refactor del modello dati, aggiornare insieme schema Sanity, query, mapper, validazioni e documentazione.
+Il sito non introduce cookie, tracker, embed o font remoti. Prima della pubblicazione definitiva verificare l’informativa con il titolare, in particolare posta, conservazione e trasferimenti dei dati. La data di revisione dei testi privacy resta esplicita.
 
 ## Diritti e licenze
 
-Il codice originale, la documentazione originale, il nome, i loghi e i contenuti dell’associazione sono di titolarità di **Asso è… La Strada ci Insegna ODV**, con tutti i diritti riservati. Le condizioni sono riportate in [LICENSE](LICENSE).
+Il codice e la documentazione originali, il nome, i loghi e i contenuti dell’associazione sono di titolarità di **Asso è… La Strada ci Insegna ODV**, con tutti i diritti riservati: vedere [LICENSE](LICENSE).
 
-I componenti di terze parti mantengono le rispettive licenze. I relativi avvisi sono descritti in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) e inclusi nelle build del sito e dello Studio.
+I componenti di terze parti mantengono le rispettive licenze. Gli avvisi sono descritti in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) e inclusi nelle build di sito e Studio.

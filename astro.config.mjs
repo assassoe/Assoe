@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import { liveInitiativeArchives } from './scripts/live-initiative-archives.mjs';
 import { thirdPartyNotices } from './scripts/third-party-notices.mjs';
+import { publicationFiles } from './scripts/publication-files.mjs';
 
 const base = process.env.SITE_BASE || '/';
 const redirectBase = base === '/' ? '' : `/${base.replace(/^\/+|\/+$/g, '')}`;
@@ -8,7 +9,7 @@ const redirectBase = base === '/' ? '' : `/${base.replace(/^\/+|\/+$/g, '')}`;
 export default defineConfig({
   site: process.env.SITE_URL || 'https://assoe.it',
   base,
-  integrations: [liveInitiativeArchives()],
+  integrations: [liveInitiativeArchives(), publicationFiles()],
   vite: {
     plugins: [thirdPartyNotices({
       additionalPackages: [

@@ -14,7 +14,7 @@ test('la copertura segnala anche i moduli mai importati, compresi quelli in sott
   const files = ['src/utils/tested.ts', 'src/utils/nested/untested.ts', 'src/scripts/browser.ts',
     'src/content/providers/provider.ts', 'shared/helper.ts', 'studio/schemaTypes/slugValidation.ts',
     'studio/schemaTypes/editorialImage.ts', 'studio/schemaTypes/galleryUpload.ts', 'studio/schemaTypes/featuredArticles.ts', 'studio/structure/initiatives.ts',
-    'scripts/quality-report-lib.mjs', 'scripts/quality-report.mjs', 'scripts/sonar-report.mjs'];
+    'scripts/quality-report-lib.mjs', 'scripts/quality-report.mjs', 'scripts/sonar-report.mjs', 'scripts/publication-files.mjs'];
   for (const file of [...files, 'src/utils/types.d.ts', 'src/utils/readme.md']) {
     fs.writeFileSync(path.join(root, file), '');
   }
