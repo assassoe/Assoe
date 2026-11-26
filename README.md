@@ -63,6 +63,7 @@ I file `.env` sono esclusi da Git. Non inserire token, credenziali o dati riserv
 | `src/config/`, `src/utils/`, `shared/` | Configurazione e funzioni di supporto |
 | `studio/` | Schemi e interfaccia dello Studio Sanity |
 | `scripts/`, `tests/` | Build, verifiche e test automatici |
+| `docs/class.puml`, `docs/licenses/` | Modello dei contenuti e avvisi di licenza integrativi |
 
 Le pagine dipendono dal contratto in [src/content/types.ts](src/content/types.ts); query, validazione e mapping del CMS sono in [src/content/providers/](src/content/providers/). Le modifiche al modello devono mantenere coerenti schemi Studio, query, mapper e test.
 
@@ -88,10 +89,13 @@ I comandi seguenti si eseguono dalla radice. Anche i test richiedono le dipenden
 | `npm run build` | Genera il sito statico in `dist/` |
 | `npm run check:build` | Controlla HTML, collegamenti e struttura dell’ultima build |
 | `npm run preview` | Serve la build su `http://localhost:4323/` |
+| `npm run clean` | Rimuove build, cache e report generati di sito e Studio |
 | `npm audit --omit=dev --audit-level=high` | Verifica le dipendenze del sito |
 | `npm run quality:report` | Raccoglie verifiche e report di sito e Studio |
 
 La build richiede configurazione Sanity valida e accesso alla rete per contenuti e immagini. La preview legge `dist/` e cambia soltanto dopo una nuova build; per lo sviluppo usare `npm run dev`.
+
+Eseguire `npm run clean` a server di sviluppo e verifiche fermi. Il comando conserva sorgenti, dipendenze installate, file di ambiente e backup; per usare la preview dopo la pulizia occorre una nuova build.
 
 Per verificare lo Studio:
 

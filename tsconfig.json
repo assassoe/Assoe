@@ -18,6 +18,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["studio", "crawl-rendered", "archivio-iniziative", "quality-reports", "coverage", "dist", "node_modules"]
+  "include": [".astro/types.d.ts", "src/**/*", "shared/**/*", "scripts/**/*", "tests/**/*", "astro.config.mjs"],
+  "exclude": ["studio", "quality-reports", "coverage", "dist", "node_modules"]
 }

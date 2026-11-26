@@ -11,8 +11,3 @@ quality-reports/
 .env.*
 !.env.example
 .DS_Store
-
-# Temporaneo: file prodotti dal crawl del vecchio sito
-/crawl-rendered/
-/volontariato.assoe.it/
-/tools/crawl-rendered.mjs
