@@ -3,7 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import JoinUsCta from '@/components/JoinUsCta.astro';
 import PersonCard from '@/components/PersonCard.astro';
 import { contentRepository } from '@/content';
-import { groupPeopleByRole } from '@/utils/people';
+import { groupPeopleForDirectory } from '@/utils/people';
 import { getPageAssociation } from '@/utils/association';
 import AssociationName from '@/components/AssociationName.astro';
 
@@ -12,7 +12,7 @@ const [association, people] = await Promise.all([
   contentRepository.listPeople(),
 ]);
 
-const groups = groupPeopleByRole(people);
+const groups = groupPeopleForDirectory(people);
 ---
 
 <BaseLayout title="Associati" association={association}>
@@ -27,9 +27,9 @@ const groups = groupPeopleByRole(people);
       <p class="notice">Le persone dell’associazione saranno pubblicate presto.</p>
     ) : (
       groups.map((group) => (
-        <section class="people-role" aria-labelledby={`ruolo-${group.role}`}>
-          <h2 id={`ruolo-${group.role}`}>{group.title}</h2>
-          <ul class="people-grid">
+        <section class="people-role" aria-labelledby={`gruppo-${group.id}`}>
+          <h2 id={`gruppo-${group.id}`}>{group.title}</h2>
+          <ul class="people-grid people-grid--compact">
             {group.people.map((person) => <PersonCard person={person} />)}
           </ul>
         </section>

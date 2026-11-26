@@ -39,6 +39,7 @@ test('la homepage genera le sezioni nell’ordine editoriale conservando contenu
     historical: { ...content, articles: [{ ...content.articles[0], slug: 'ricordo', historicalUndated: true }] },
     empty: { homeSections: reversed, notices: [], initiatives: [], articles: [] },
     noFeatured: { ...content, articles: content.articles.map(({ featured, ...article }) => article) },
+    mixed: { ...content, articles: content.articles.map((article, index) => ({ ...article, featured: index < 2 })) },
   })) {
     fs.writeFileSync(path.join(fixture, 'src/pages', `${name}.astro`), `---
 import HomeSections from '../components/HomeSections.astro';
@@ -150,9 +151,13 @@ Astro.locals.associationInfo = Promise.resolve(${JSON.stringify(identity)});
   const reordered = document('reordered');
   assert.deepEqual(sectionIds(reordered), ['hero', ...expected.toReversed()]);
   assert.deepEqual([...reordered.querySelectorAll('[aria-labelledby="iniziative-social"] h3')].map((node) => node.textContent), ['social 1', 'social 2']);
-  assert.deepEqual([...reordered.querySelectorAll('[aria-labelledby="articoli-home"] h3')].map((node) => node.textContent), ['Articolo 6', 'Articolo 5', 'Articolo 4', 'Articolo 3', 'Articolo 2']);
-  assert.equal(reordered.querySelectorAll('.article-list--featured .article-list__star[aria-hidden="true"]').length, 5);
-  assert.deepEqual([...document('noFeatured').querySelectorAll('[aria-labelledby="articoli-home"] h3')].map(node => node.textContent), ['Articolo 7', 'Articolo 6', 'Articolo 5']);
+  assert.deepEqual([...reordered.querySelectorAll('[aria-labelledby="articoli-home"] h3')].map((node) => node.textContent), ['Articolo 6', 'Articolo 5', 'Articolo 4', 'Articolo 3']);
+  assert.equal(reordered.querySelectorAll('.article-list__star[aria-hidden="true"]').length, 4);
+  assert.deepEqual([...document('noFeatured').querySelectorAll('[aria-labelledby="articoli-home"] h3')].map(node => node.textContent), ['Articolo 7', 'Articolo 6', 'Articolo 5', 'Articolo 4']);
+  const mixed = document('mixed').querySelector('[aria-labelledby="articoli-home"]');
+  assert.deepEqual([...mixed.querySelectorAll('h3')].map(node => node.textContent), ['Articolo 2', 'Articolo 1', 'Articolo 7', 'Articolo 6']);
+  assert.equal(mixed.querySelectorAll('.article-list__star').length, 2);
+  assert.equal(mixed.querySelectorAll('.article-list__item:not(.article-list__item--featured)').length, 2);
   assert.equal(document('noFeatured').querySelector('.article-list__star'), null);
   assert.equal(document('noFeatured').querySelector('.home-articles__eyebrow').textContent, 'Ultimi articoli');
   assert.match(document('empty').querySelector('[aria-labelledby="articoli-home"] .notice').textContent, /Non ci sono ancora articoli/);

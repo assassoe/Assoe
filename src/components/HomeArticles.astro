@@ -22,7 +22,7 @@ const hasFeatured = selected.some(({ featured }) => featured === true);
   </div>
   {
     selected.length > 0 ? (
-      <ArticleList articles={selected} variant={hasFeatured ? 'featured' : 'default'} />
+      <ArticleList articles={selected} variant="mixed" />
     ) : (
       <p class="notice">Non ci sono ancora articoli pubblicati.</p>
     )

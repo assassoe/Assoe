@@ -7,7 +7,7 @@ import { formatDate } from '@/utils/date';
 interface Props {
   articles: ArticleSummary[];
   headingLevel?: 2 | 3;
-  variant?: 'default' | 'featured';
+  variant?: 'default' | 'featured' | 'mixed';
 }
 
 const { articles, headingLevel = 3, variant = 'default' } = Astro.props;
@@ -15,11 +15,14 @@ const { articles, headingLevel = 3, variant = 'default' } = Astro.props;
 
 <ul class:list={['article-list', { 'article-list--featured': variant === 'featured' }]}>
   {articles.map((article) => (
-    <li class="article-list__item">
-      {variant === 'featured' && (
+    <li class:list={['article-list__item', { 'article-list__item--featured': variant === 'featured' || (variant === 'mixed' && article.featured === true) }]}>
+      {(variant === 'featured' || (variant === 'mixed' && article.featured === true)) && (
+        <>
+        <span class="visually-hidden">Articolo in evidenza</span>
         <svg class="article-list__star" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path d="m12 2.5 2.94 5.96 6.58.96-4.76 4.64 1.12 6.55L12 17.52l-5.88 3.09 1.12-6.55-4.76-4.64 6.58-.96Z" />
         </svg>
+        </>
       )}
       <a class:list={['article-list__link', { 'article-list__link--text-only': !article.imageUrl }]} href={sitePath(`/articoli/${article.slug}/`)}>
         {!article.historicalUndated && <time class="article-list__date" datetime={article.publishedAt}>{formatDate(article.publishedAt)}</time>}

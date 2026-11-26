@@ -19,15 +19,16 @@ const dimensions: Record<Variant, { width: number; height: number; fit: 'cover' 
   poster: { width: 900, height: 1200, fit: 'contain' },
   portrait: { width: 500, height: 600, fit: 'cover' },
   galleryThumb: { width: 800, height: 600, fit: 'contain' },
-  gallery: { width: 1200, height: 900, fit: 'contain' },
+  gallery: { width: 2400, height: 1800, fit: 'contain' },
   logo: { width: 300, height: 160, fit: 'contain' },
   logoLarge: { width: 640, height: 480, fit: 'contain' },
   institutionalLogo: { width: 1200, height: 400, fit: 'contain' },
 };
 
-const { width, height, fit } = dimensions[variant];
+const { width: configuredWidth, height, fit } = dimensions[variant];
 const format = src.split(/[?#]/, 1)[0].toLowerCase().endsWith('.svg') ? 'svg' : undefined;
 const originalSize = fit === 'contain' ? await getRemoteImageSize(src) : null;
+const width = variant === 'gallery' && originalSize ? Math.min(configuredWidth, originalSize.width) : configuredWidth;
 const outputHeight = originalSize ? Math.max(1, Math.round(width * originalSize.height / originalSize.width)) : height;
 ---
 
@@ -52,9 +53,9 @@ const outputHeight = originalSize ? Math.max(1, Math.round(width * originalSize.
     alt={alt}
     width={width}
     height={outputHeight}
-    layout="constrained"
+    layout={variant === 'gallery' ? 'none' : 'constrained'}
     fit="contain"
-    quality="mid"
+    quality={variant === 'gallery' ? 'high' : 'mid'}
     loading={eager ? 'eager' : 'lazy'}
     fetchpriority={eager ? 'high' : 'auto'}
     class={`content-image content-image--${variant}`}

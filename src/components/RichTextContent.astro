@@ -1,9 +1,13 @@
 ---
+import { sanitizeRichTextHtml } from '@/utils/sanitizeHtml';
+
 interface Props {
   html?: string;
+  basePath?: string;
 }
 
-const { html } = Astro.props;
+const { html, basePath } = Astro.props;
+const content = html && basePath ? sanitizeRichTextHtml(html, basePath) : html;
 ---
 
-{html && <div class="detail__body" set:html={html} />}
+{content && <div class="detail__body" set:html={content} />}

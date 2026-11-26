@@ -19,20 +19,32 @@ const { id, title, imageAlt, imageUrls } = Astro.props;
     <ul class="gallery-grid">
       {imageUrls.map((url, index) => (
         <li>
-          <button type="button" class="gallery-grid__button" data-gallery-open={`${id}-foto-${index + 1}`} aria-haspopup="dialog" aria-label={`Ingrandisci la foto ${index + 1} di ${imageUrls.length}`}>
+          <a href={url} class="gallery-grid__button" data-gallery-open={`${id}-foto-${index + 1}`} aria-haspopup="dialog" aria-label={`Ingrandisci la foto ${index + 1} di ${imageUrls.length}`}>
             <ContentImage src={url} alt={`${imageAlt}, foto ${index + 1}`} variant="galleryThumb" />
-          </button>
+          </a>
         </li>
       ))}
     </ul>
     {imageUrls.map((url, index) => (
       <dialog id={`${id}-foto-${index + 1}`} class="gallery-lightbox" aria-label={`Foto ${index + 1} di ${imageUrls.length}: ${imageAlt}`} tabindex="-1">
-        <form method="dialog">
-          <button type="submit" class="gallery-lightbox__close" aria-label="Chiudi foto">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" /></svg>
-          </button>
-        </form>
-        <ContentImage src={url} alt={`${imageAlt}, foto ${index + 1}`} variant="gallery" />
+        <div class="gallery-lightbox__viewer" data-gallery-viewer>
+          <div class="gallery-lightbox__toolbar" role="group" aria-label="Controlli foto">
+            <span class="gallery-lightbox__counter">Foto {index + 1} / {imageUrls.length}</span>
+            <button type="button" data-gallery-action="out" aria-label="Riduci zoom">−</button>
+            <output data-gallery-zoom aria-live="polite" aria-label="Livello di zoom">100%</output>
+            <button type="button" data-gallery-action="in" aria-label="Aumenta zoom">+</button>
+            <button type="button" data-gallery-action="reset">Adatta</button>
+            <button type="button" data-gallery-action="fullscreen" hidden>Schermo intero</button>
+            <a href={url} target="_blank" rel="noopener noreferrer">Originale ↗</a>
+            <button type="button" data-gallery-action="close" aria-label="Chiudi foto">Chiudi ×</button>
+          </div>
+          <div class="gallery-lightbox__stage" data-gallery-stage tabindex="0" aria-label="Foto: usa i pulsanti o la rotella per ingrandire, trascina per spostarti">
+            <div class="gallery-lightbox__canvas" data-gallery-canvas>
+              <ContentImage src={url} alt={`${imageAlt}, foto ${index + 1}`} variant="gallery" />
+            </div>
+          </div>
+          <p class="visually-hidden" data-gallery-status role="status"></p>
+        </div>
       </dialog>
     ))}
   </section>

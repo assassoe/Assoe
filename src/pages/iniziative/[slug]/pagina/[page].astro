@@ -1,0 +1,30 @@
+---
+import type { GetStaticPaths } from 'astro';
+import InitiativeDetailPage from '@/components/InitiativeDetailPage.astro';
+import { contentRepository } from '@/content';
+import { ARCHIVE_PAGE_SIZE } from '@/config/pagination';
+import { paginateArchive } from '@/utils/pagination';
+import { sitePath } from '@/utils/sitePath';
+
+export const getStaticPaths = (async () => {
+  const initiatives = await contentRepository.listInitiatives();
+  const paths = await Promise.all(initiatives.map(async ({ slug }) => {
+    const initiative = await contentRepository.getInitiativeBySlug(slug);
+    const totalPages = Math.ceil((initiative?.relatedArticles.length ?? 0) / ARCHIVE_PAGE_SIZE);
+    return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => ({ params: { slug, page: String(index + 2) } }));
+  }));
+  return paths.flat();
+}) satisfies GetStaticPaths;
+
+const { slug, page } = Astro.params;
+const initiative = slug ? await contentRepository.getInitiativeBySlug(slug) : null;
+if (!initiative) {
+  if (import.meta.env.DEV) return Astro.redirect(sitePath('/'), 302);
+  throw new Error(`Iniziativa non trovata durante la build: ${slug}`);
+}
+const currentPage = Number(page);
+if (currentPage < 2 || !paginateArchive(initiative.relatedArticles, currentPage, ARCHIVE_PAGE_SIZE)) {
+  return Astro.redirect(sitePath(`/iniziative/${initiative.slug}/`) + '#articoli-iniziativa', 302);
+}
+---
+<InitiativeDetailPage {initiative} {currentPage} />

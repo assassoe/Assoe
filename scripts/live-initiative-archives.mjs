@@ -5,6 +5,7 @@ export function liveInitiativeArchives() {
     'src/pages/[initiativeArea]/index.astro',
     'src/pages/[initiativeArea]/pagina/[page].astro',
     'src/pages/iniziative/[slug].astro',
+    'src/pages/iniziative/[slug]/pagina/[page].astro',
   ]);
   return {
     name: 'assoe-live-initiative-archives',

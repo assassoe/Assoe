@@ -1,0 +1,70 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BrandEyebrow from '@/components/BrandEyebrow.astro';
+import ArticleList from '@/components/ArticleList.astro';
+import EventCard from '@/components/EventCard.astro';
+import DetailLead from '@/components/DetailLead.astro';
+import RichTextContent from '@/components/RichTextContent.astro';
+import RelatedContentSection from '@/components/RelatedContentSection.astro';
+import InitiativeSpecialSections from '@/components/InitiativeSpecialSections.astro';
+import type { InitiativeDetail } from '@/content/types';
+import Pagination from './Pagination.astro';
+import { ARCHIVE_PAGE_SIZE } from '@/config/pagination';
+import { formatDateTime } from '@/utils/date';
+import { sitePath } from '@/utils/sitePath';
+import { initiativeSections } from '@/utils/initiatives';
+
+interface Props { initiative: InitiativeDetail; currentPage?: number; }
+const { initiative, currentPage = 1 } = Astro.props;
+const section = initiativeSections.find(({ value }) => value === initiative.area)!;
+const articles = initiative.relatedArticles.slice((currentPage - 1) * ARCHIVE_PAGE_SIZE, currentPage * ARCHIVE_PAGE_SIZE);
+const lastPage = Math.ceil(initiative.relatedArticles.length / ARCHIVE_PAGE_SIZE);
+const contentBasePath = sitePath(`/iniziative/${initiative.slug}/`);
+const specialSections = initiative.specialSections ?? [];
+const logos = specialSections.filter(({ kind }) => kind === 'logos');
+const communications = specialSections.filter(({ kind }) => kind === 'institutional');
+const details = specialSections.filter(({ kind }) => kind !== 'logos');
+---
+
+<BaseLayout title={currentPage === 1 ? initiative.name : `${initiative.name} · Articoli · Pagina ${currentPage}`} navigationPath={sitePath(section.path)}>
+  <main id="contenuto" class="container detail">
+    <div class="detail__header">
+      <a class="text-link" href={sitePath(section.path)}>← {section.title}</a>
+      <BrandEyebrow />
+      <h1>{initiative.name}</h1>
+    </div>
+    <DetailLead imageUrl={initiative.imageUrl} imageAlt={`Immagine dell’iniziativa ${initiative.name}`} hasText={Boolean(initiative.descriptionHtml)}>
+      <RichTextContent html={initiative.descriptionHtml} basePath={contentBasePath} />
+    </DetailLead>
+    {logos.length === 0 && communications.length > 0 && (
+      <div class="initiative-support-summary">
+        {communications.map(({ id, title }) => (
+          <p><a class="text-link" href={`#${id}`}>{title} <span aria-hidden="true">↓</span></a></p>
+        ))}
+      </div>
+    )}
+    <InitiativeSpecialSections sections={logos} basePath={contentBasePath} supportLinks={communications} />
+
+    {
+      initiative.relatedArticles.length > 0 && (
+        <RelatedContentSection id="articoli-iniziativa" title="Le storie di questa iniziativa" description="Articoli e aggiornamenti per conoscerla più da vicino.">
+          <ArticleList {articles} />
+          {lastPage > 1 && <Pagination basePath={`/iniziative/${initiative.slug}/`} {currentPage} {lastPage} label={`articoli di ${initiative.name}`} anchor="#articoli-iniziativa" />}
+        </RelatedContentSection>
+      )
+    }
+
+    {
+      initiative.relatedEvents.length > 0 && (
+        <RelatedContentSection id="eventi-iniziativa" title="L’iniziativa prende vita" description="Gli incontri che fanno parte del suo percorso.">
+          <div class="content-grid">
+            {initiative.relatedEvents.map((event) => (
+              <EventCard href={sitePath(`/eventi/${event.slug}/`)} title={event.title} imageUrl={event.imageUrl} meta={formatDateTime(event.date)} />
+            ))}
+          </div>
+        </RelatedContentSection>
+      )
+    }
+    <InitiativeSpecialSections sections={details} basePath={contentBasePath} />
+  </main>
+</BaseLayout>

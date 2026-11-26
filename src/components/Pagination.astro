@@ -7,10 +7,11 @@ interface Props {
   currentPage: number;
   lastPage: number;
   label: string;
+  anchor?: string;
 }
 
-const { basePath, currentPage, lastPage, label } = Astro.props;
-const pageHref = (pageNumber: number) => sitePath(pageNumber === 1 ? basePath : `${basePath}pagina/${pageNumber}/`);
+const { basePath, currentPage, lastPage, label, anchor = '' } = Astro.props;
+const pageHref = (pageNumber: number) => sitePath(pageNumber === 1 ? basePath : `${basePath}pagina/${pageNumber}/`) + anchor;
 const pageLinks = paginationItems(currentPage, lastPage);
 ---
 

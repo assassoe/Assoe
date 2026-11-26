@@ -7,7 +7,7 @@ import { galleryDescription, imageDescription } from './imageDescriptions';
 import { GalleryInput } from './GalleryInput';
 import { facebookPostField } from './facebookPostField';
 import { validateFeaturedArticle } from './featuredArticles';
-import { MAX_FEATURED_ARTICLES } from '../../shared/featuredArticles';
+import { MAX_FEATURED_ARTICLES, HOME_ARTICLE_COUNT } from '../../shared/featuredArticles';
 
 export const article = defineType({
   name: 'article',
@@ -36,7 +36,7 @@ export const article = defineType({
       title: 'In evidenza nella homepage',
       type: 'boolean',
       initialValue: false,
-      description: `Attiva per scegliere questo articolo tra i preferiti della homepage, fino a ${MAX_FEATURED_ARTICLES} in totale. Pubblica l’articolo e ricostruisci il sito per aggiornare la selezione.`,
+      description: `Puoi scegliere fino a ${MAX_FEATURED_ARTICLES} preferiti. La homepage mostra ${HOME_ARTICLE_COUNT} articoli: prima i preferiti più recenti, poi gli ultimi articoli per completare i posti. Tutti i preferiti compaiono anche nella pagina Articoli. Pubblica e ricostruisci il sito per aggiornare la selezione.`,
       validation: (rule) => rule.custom(validateFeaturedArticle),
     }),
     defineField({

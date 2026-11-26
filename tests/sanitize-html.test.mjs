@@ -2,6 +2,22 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { sanitizeRichTextHtml } from '../src/utils/sanitizeHtml.ts';
 
+test('i collegamenti relativi dei contenuti ripetuti si risolvono dalla pagina originale', () => {
+  const base = '/Assoe/iniziative/banco-alimentare/';
+  assert.equal(sanitizeRichTextHtml('<p><a href="../../chi-siamo/#contatti">Contatti</a></p>', base), '<p><a href="/Assoe/chi-siamo/#contatti">Contatti</a></p>');
+  assert.equal(sanitizeRichTextHtml('<a href="documenti/?anno=2026&amp;tipo=pdf">Documento</a>', base), '<a href="/Assoe/iniziative/banco-alimentare/documenti/?anno=2026&amp;tipo=pdf">Documento</a>');
+  for (const href of ['https://example.org/doc', 'mailto:info@example.org', '#sezione', '/chi-siamo/']) {
+    assert.equal(sanitizeRichTextHtml(`<a href="${href}">Link</a>`, base), `<a href="${href}">Link</a>`);
+  }
+  assert.equal(sanitizeRichTextHtml('<a>Testo</a>', base), '<a>Testo</a>');
+});
+
+test('la risoluzione dei collegamenti non aggira i protocolli ammessi', () => {
+  for (const href of ['javascript:alert(1)', '//evil.example', ' //evil.example']) {
+    assert.equal(sanitizeRichTextHtml(`<a href="${href}" onclick="alert(1)">Link</a>`, '/Assoe/iniziative/banco/'), '<a>Link</a>');
+  }
+});
+
 test('mantiene il contenuto formattato consentito', () => {
   assert.equal(
     sanitizeRichTextHtml('<p>Un <strong>testo</strong> <a href="https://example.org">utile</a>.</p>'),

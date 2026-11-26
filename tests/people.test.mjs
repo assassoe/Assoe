@@ -1,9 +1,20 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { getBoardMembers, groupPeopleByRole } from '../src/utils/people.ts';
+import { getBoardMembers, groupPeopleByRole, groupPeopleForDirectory } from '../src/utils/people.ts';
 import { PERSON_ROLE_GROUPS, personRoleLabel } from '../shared/personRoles.ts';
 
 const person = (id, role) => ({ id, firstName: id, lastName: 'Test', role });
+
+test('la pagina associati unisce il direttivo e mantiene separate le altre due sezioni', () => {
+  const input = Object.freeze([person('socio', 'volunteer'), person('consigliere', 'boardMember'), person('civile', 'civilServiceVolunteer'), person('presidente', 'president'), person('vice', 'vicePresident'), person('segretario', 'secretary')].map(Object.freeze));
+  const groups = groupPeopleForDirectory(input);
+  assert.deepEqual(groups.map(({ title }) => title), ['Direttivo', 'Servizio civile', 'Associati']);
+  assert.deepEqual(groups.map(({ people }) => people.map(({ id }) => id)), [['presidente', 'vice', 'segretario', 'consigliere'], ['civile'], ['socio']]);
+  assert.deepEqual(groupPeopleForDirectory([]), []);
+  assert.deepEqual(groupPeopleForDirectory([person('ignoto', 'other')]), []);
+  assert.deepEqual(groupPeopleForDirectory([person('socio', 'volunteer')]).map(({ id }) => id), ['associati']);
+  assert.equal(input[0].id, 'socio');
+});
 
 test('raggruppa i ruoli nella gerarchia fissa mantenendo l’ordine dentro ogni ruolo', () => {
   const groups = groupPeopleByRole([

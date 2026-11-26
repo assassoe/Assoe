@@ -11,7 +11,7 @@ test('solo gli archivi e i dettagli delle iniziative diventano dinamici durante 
   for (const command of ['dev', 'build', 'preview', 'sync']) {
     const integration = liveInitiativeArchives();
     integration.hooks['astro:config:setup']({ command });
-    for (const component of ['src/pages/[initiativeArea]/index.astro', 'src/pages/[initiativeArea]/pagina/[page].astro', 'src/pages/iniziative/[slug].astro', 'src/pages/articoli/[slug].astro']) {
+    for (const component of ['src/pages/[initiativeArea]/index.astro', 'src/pages/[initiativeArea]/pagina/[page].astro', 'src/pages/iniziative/[slug].astro', 'src/pages/iniziative/[slug]/pagina/[page].astro', 'src/pages/articoli/[slug].astro']) {
       const route = { component };
       integration.hooks['astro:route:setup']({ route });
       assert.equal(route.prerender, command === 'dev' && !component.includes('articoli') ? false : undefined);
@@ -32,7 +32,7 @@ test('lo stesso server recepisce rimozioni, nuovi percorsi e spostamenti senza m
   fs.cpSync(path.join(project, 'src'), path.join(root, 'src'), { recursive: true, filter: source => source !== path.join(project, 'src/pages') });
   fs.cpSync(path.join(project, 'shared'), path.join(root, 'shared'), { recursive: true });
   fs.symlinkSync(path.join(project, 'node_modules'), path.join(root, 'node_modules'), 'dir');
-  for (const file of ['[initiativeArea]/index.astro', '[initiativeArea]/pagina/[page].astro', 'iniziative/[slug].astro']) {
+  for (const file of ['[initiativeArea]/index.astro', '[initiativeArea]/pagina/[page].astro', 'iniziative/[slug].astro', 'iniziative/[slug]/pagina/[page].astro']) {
     const destination = path.join(root, 'src/pages', file);
     fs.mkdirSync(path.dirname(destination), { recursive: true });
     fs.copyFileSync(path.join(project, 'src/pages', file), destination);
@@ -44,7 +44,7 @@ export const contentRepository = {
   getAssociationInfo: async () => null,
   getInitiativeBySlug: async (slug: string) => {
     const record = (await current()).find((i: {slug: string}) => i.slug === slug);
-    return record ? {...record, relatedArticles: [], relatedEvents: []} : null;
+    return record ? {...record, relatedArticles: record.relatedArticles ?? [], relatedEvents: []} : null;
   },
 };`);
   const record = (id, area = 'volunteering') => ({ id, slug: id, name: id, area });
@@ -75,4 +75,14 @@ export const contentRepository = {
   assert.doesNotMatch((await read('/volontariato/')).html, /original-1/);
   assert.match((await read('/iniziative-sociali/')).html, /original-1/);
   assert.equal((await read('/ambito-inesistente/')).location, '/Assoe/');
+  const initiative = records.find(record => record.id === 'original-1');
+  initiative.relatedArticles = Array.from({ length: 7 }, (_, i) => ({ id: `storia-${i}`, slug: `storia-${i}`, title: `Storia ${i}`, publishedAt: '2026-01-01T10:00:00Z' }));
+  save();
+  assert.match((await read('/iniziative/original-1/pagina/2/')).html, /Storia 6/);
+  assert.equal((await read('/iniziative/original-1/pagina/1/')).location, '/Assoe/iniziative/original-1/#articoli-iniziativa');
+  assert.equal((await read('/iniziative/original-1/pagina/non-valida/')).location, '/Assoe/iniziative/original-1/#articoli-iniziativa');
+  assert.equal((await read('/iniziative/inesistente/pagina/2/')).location, '/Assoe/');
+  initiative.relatedArticles = [];
+  save();
+  assert.equal((await read('/iniziative/original-1/pagina/2/')).location, '/Assoe/iniziative/original-1/#articoli-iniziativa');
 });

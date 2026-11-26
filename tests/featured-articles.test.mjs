@@ -83,17 +83,27 @@ test('disattivazione e campo assente non richiedono rete; gli errori di verifica
 });
 
 
-test('senza preferiti la home mostra gli ultimi tre senza modificare l’elenco ricevuto', () => {
+test('senza preferiti la home mostra gli ultimi quattro senza modificare l’elenco ricevuto', () => {
   const input = Object.freeze([article('vecchio', { publishedAt: '2020-01-01T10:00:00Z' }), article('secondo', { publishedAt: '2024-01-01T10:00:00Z' }), article('ultimo', { publishedAt: '2026-01-01T10:00:00Z' }), article('terzo', { publishedAt: '2023-01-01T10:00:00Z' })].map(Object.freeze));
-  assert.deepEqual(selectHomeArticles(input).map(a => a.id), ['ultimo', 'secondo', 'terzo']);
+  assert.deepEqual(selectHomeArticles(input).map(a => a.id), ['ultimo', 'secondo', 'terzo', 'vecchio']);
   assert.equal(input[0].id, 'vecchio');
   assert.deepEqual(selectHomeArticles([]), []);
   assert.deepEqual(selectHomeArticles(input.slice(0, 2)).map(a => a.id), ['secondo', 'vecchio']);
-  assert.deepEqual(selectHomeArticles([...input, article('scelto', { featured: true })]).map(a => a.id), ['scelto']);
+  assert.deepEqual(selectHomeArticles([...input, article('scelto', { featured: true })]).map(a => a.id), ['scelto', 'ultimo', 'secondo', 'terzo']);
 });
 
 test('il ripiego sui recenti conserva i ricordi senza data in fondo e risolve le parità', () => {
   const input = [article('storico', { historicalUndated: true, publishedAt: '2026-11-20T10:00:00Z' }), article('b'), article('a'), article('vecchio', { publishedAt: '2010-01-01T10:00:00Z' })];
-  assert.deepEqual(selectHomeArticles(input).map(a => a.id), ['a', 'b', 'vecchio']);
+  assert.deepEqual(selectHomeArticles(input).map(a => a.id), ['a', 'b', 'vecchio', 'storico']);
   assert.deepEqual(selectHomeArticles(input.slice(0, 2)).map(a => a.id), ['b', 'storico']);
+});
+
+test('quattro posti complessivi danno priorità ai preferiti senza ripeterli fra i recenti', () => {
+  const input = [article('recente-2', { publishedAt: '2026-02-01T10:00:00Z' }), article('scelto-1', { featured: true }), article('recente-1', { publishedAt: '2026-01-01T10:00:00Z' }), article('scelto-2', { featured: true }), article('normale')];
+  assert.deepEqual(selectHomeArticles(input).map(({ id }) => id), ['scelto-1', 'scelto-2', 'recente-2', 'recente-1']);
+  assert.equal(new Set(selectHomeArticles(input).map(({ id }) => id)).size, 4);
+  const many = Array.from({ length: 7 }, (_, i) => article(`preferito-${i}`, { featured: true }));
+  assert.equal(selectHomeArticles(many).length, 4);
+  assert.equal(selectFeaturedArticles(many).length, 5);
+  assert.equal(selectHomeArticles([article('unico', { featured: true })]).length, 1);
 });

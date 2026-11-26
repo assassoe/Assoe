@@ -18,3 +18,12 @@ export function groupPeopleByRole(people: readonly PersonSummary[]) {
 export function getBoardMembers(people: readonly PersonSummary[]): PersonSummary[] {
   return boardRoles.flatMap((role) => people.filter((person) => person.role === role));
 }
+
+/** Le tre sezioni pubbliche conservano i ruoli delle singole persone. */
+export function groupPeopleForDirectory(people: readonly PersonSummary[]) {
+  return [
+    { id: 'direttivo', title: 'Direttivo', people: getBoardMembers(people) },
+    { id: 'servizio-civile', title: 'Servizio civile', people: people.filter(({ role }) => role === 'civilServiceVolunteer') },
+    { id: 'associati', title: 'Associati', people: people.filter(({ role }) => role === 'volunteer') },
+  ].filter((group) => group.people.length > 0);
+}
